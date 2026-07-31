@@ -1,0 +1,2498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="YUKI代理">
+<title>YUKI豪宅代理 - 独家代理人工作台</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%;font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji","EmojiOne Color","Twemoji Mozilla",sans-serif;background:#0a0a0a;color:#e0e0e0;line-height:1.5;overflow-x:hidden;padding-top:60px;padding-bottom:64px;min-height:100vh}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:16px;outline:none;border:none;background:none;color:inherit;width:100%}
+img{max-width:100%;display:block}
+ul,ol{list-style:none}
+:root{
+  --gold:#c9a961;--gold-light:#e0c98a;--gold-dark:#9b7d3f;
+  --bg:#0a0a0a;--bg-card:#161616;--bg-card2:#1e1e1e;--bg-input:#222;
+  --text:#e0e0e0;--text-dim:#888;--text-mid:#bbb;
+  --border:#2a2a2a;--green:#66bb6a;--red:#ef5350;--orange:#ff9800;--blue:#42a5f5;
+}
+
+/* Header */
+.app-header{position:fixed;top:0;left:0;right:0;height:60px;background:linear-gradient(135deg,#0d0d0d,#1a1a1a);border-bottom:1px solid var(--gold-dark);z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 14px;padding-top:env(safe-area-inset-top)}
+.brand{display:flex;align-items:center;gap:8px}
+.logo{font-size:14px;font-weight:700;color:var(--gold);background:rgba(201,169,97,.15);border-radius:6px;padding:3px 7px;font-family:Georgia,serif;letter-spacing:1px}
+.property-switch{display:flex;align-items:center;gap:6px;background:rgba(201,169,97,.12);border:1px solid rgba(201,169,97,.3);border-radius:20px;padding:5px 12px;max-width:220px}
+.property-switch .name{font-size:13px;color:var(--gold-light);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.property-switch .arrow{font-size:10px;color:var(--gold);transition:transform .3s}
+.property-switch.open .arrow{transform:rotate(180deg)}
+.header-datetime{text-align:right;font-size:12px;line-height:1.3}
+.header-datetime .time{color:var(--gold);font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
+.header-datetime .date{color:var(--text-dim);font-size:10px}
+
+/* 房源下拉 */
+.property-dropdown{position:fixed;top:60px;left:0;right:0;background:var(--bg-card);border-bottom:1px solid var(--border);z-index:99;max-height:0;overflow:hidden;transition:max-height .3s ease}
+.property-dropdown.open{max-height:400px;overflow-y:auto}
+.pd-item{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer}
+.pd-item:active{background:var(--bg-card2)}
+.pd-item.active{background:rgba(201,169,97,.1)}
+.pd-name{font-size:14px;color:var(--text)}
+.pd-item.active .pd-name{color:var(--gold)}
+.pd-info{font-size:12px;color:var(--text-dim);margin-top:2px}
+.pd-check{color:var(--gold);font-size:16px}
+.pd-check.hidden{visibility:hidden}
+
+/* 页面 */
+.page{display:none;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* 通用 */
+.section{padding:12px 14px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px}
+.card-title{font-size:14px;font-weight:600;color:var(--gold-light);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.card-title .more{font-size:12px;color:var(--text-dim);font-weight:400;cursor:pointer}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:0 2px}
+.section-header h2{font-size:17px;font-weight:600;color:var(--text)}
+.section-header .sub{font-size:12px;color:var(--text-dim)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:10px;font-size:14px;font-weight:500;transition:all .2s}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#1a1a1a}
+.btn-primary:active{transform:scale(.96);opacity:.9}
+.btn-secondary{background:var(--bg-card2);color:var(--text-mid);border:1px solid var(--border)}
+.btn-outline{background:transparent;border:1px solid var(--gold-dark);color:var(--gold)}
+.btn-danger{background:rgba(229,57,53,.15);color:var(--red);border:1px solid rgba(229,57,53,.3)}
+.btn-full{width:100%}
+.btn-sm{padding:7px 14px;font-size:13px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.tag{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;background:rgba(201,169,97,.15);color:var(--gold);margin-right:4px;margin-bottom:4px}
+.tag-blue{background:rgba(66,165,245,.15);color:var(--blue)}
+.tag-green{background:rgba(102,187,106,.15);color:var(--green)}
+.empty{text-align:center;padding:40px 20px;color:var(--text-dim)}
+.empty .icon{font-size:40px;margin-bottom:8px;opacity:.4;font-family:Georgia,serif}
+.empty p{font-size:13px}
+.divider{height:1px;background:var(--border);margin:10px 0}
+
+/* 等级色 */
+.level-A{background:rgba(102,187,106,.2);color:var(--green)}
+.level-B{background:rgba(66,165,245,.2);color:var(--blue)}
+.level-C{background:rgba(255,152,0,.2);color:var(--orange)}
+.level-成交{background:rgba(201,169,97,.2);color:var(--gold)}
+.level-归档{background:rgba(136,136,136,.2);color:var(--text-dim)}
+.status-在售{color:var(--green)}
+.status-已售{color:var(--text-dim)}
+.status-预订{color:var(--orange)}
+
+/* 工作台 */
+.welcome{padding:16px 14px 6px}
+.welcome h1{font-size:20px;color:var(--gold-light);font-weight:600}
+.welcome p{font-size:12px;color:var(--text-dim);margin-top:3px}
+
+/* 待办左右排列 */
+.todo-columns{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:0 4px}
+.todo-columns .todo-col{padding:8px 6px}
+.todo-columns .todo-col .card{padding:10px;margin-bottom:0;max-height:360px;overflow-y:auto;scrollbar-width:none}
+.todo-columns .todo-col .card::-webkit-scrollbar{display:none}
+.todo-columns .section-header h2{font-size:14px}
+.todo-columns .section-header .sub{font-size:11px}
+.todo-columns .todo-item{padding:8px 0;gap:6px}
+.todo-columns .todo-title{font-size:12px;line-height:1.3}
+.todo-columns .todo-time{font-size:10px;width:50px;min-width:50px}
+.todo-columns .todo-type{font-size:9px;padding:1px 4px}
+.todo-columns .todo-prop{font-size:10px}
+.todo-columns .todo-client{font-size:10px;padding:3px 4px}
+.todo-columns .todo-arrow{display:none}
+.todo-columns .todo-check{width:16px;height:16px;font-size:10px;min-width:16px}
+.todo-columns .btn-sm{font-size:11px;padding:6px 4px}
+
+/* 待办 */
+.todo-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s}
+.todo-item:hover,.todo-item:active{background:rgba(201,169,97,.05);border-radius:8px}
+.todo-item:last-child{border-bottom:none}
+.todo-check{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;cursor:pointer;font-size:12px;color:transparent}
+.todo-item.done .todo-check{background:var(--gold);border-color:var(--gold);color:#1a1a1a}
+.todo-item.done .todo-title{text-decoration:line-through;color:var(--text-dim)}
+.todo-time{font-size:11px;color:var(--gold);font-variant-numeric:tabular-nums;width:78px;flex-shrink:0;margin-top:1px;line-height:1.3}
+.todo-time .end-time{color:var(--text-dim);font-size:10px;display:block}
+.todo-content{flex:1;min-width:0;min-width:0}
+.todo-title{font-size:14px;color:var(--text);font-weight:500}
+.todo-type{font-size:11px;color:var(--text-dim);margin-top:2px;display:inline-block;padding:1px 6px;background:var(--bg-card2);border-radius:4px;margin-right:4px}
+.todo-prop{font-size:11px;color:var(--gold-light);margin-top:3px}
+.todo-client{font-size:11px;color:var(--text-mid);margin-top:3px;line-height:1.4;padding:4px 6px;background:var(--bg-card2);border-radius:6px;margin-top:4px}
+.todo-client .lbl{color:var(--text-dim);margin-right:3px}
+.todo-arrow{color:var(--text-dim);font-size:14px;flex-shrink:0;margin-top:4px}
+.todo-title{font-size:14px;color:var(--text)}
+.todo-type{font-size:11px;color:var(--text-dim);margin-top:2px}
+.todo-delete{font-size:16px;color:var(--text-dim);flex-shrink:0;padding:4px}
+
+/* 房源工作卡 */
+.work-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:12px;cursor:pointer}
+.work-card:active{background:var(--bg-card2)}
+.wc-image{width:100%;height:140px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:56px;color:rgba(201,169,97,.3)}
+.wc-body{padding:12px}
+.wc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.wc-name{font-size:15px;font-weight:600;color:var(--text)}
+.wc-price{font-size:17px;color:var(--gold);font-weight:700}
+.wc-price .unit{font-size:12px;color:var(--text-dim);font-weight:400}
+.wc-meta{font-size:12px;color:var(--text-dim);margin-bottom:8px}
+.wc-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:8px;overflow:hidden;margin-top:8px}
+.wc-stat{background:var(--bg-card2);padding:8px 4px;text-align:center}
+.wc-stat .num{font-size:15px;color:var(--gold);font-weight:600}
+.wc-stat .label{font-size:10px;color:var(--text-dim);margin-top:2px}
+.wc-alert{margin-top:8px;padding:8px 10px;background:rgba(255,152,0,.1);border:1px solid rgba(255,152,0,.2);border-radius:8px;font-size:12px;color:var(--orange);display:flex;align-items:center;gap:6px}
+
+/* 重点客户 */
+.focus-client{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.focus-client:last-child{border-bottom:none}
+.fc-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-size:15px;color:#1a1a1a;font-weight:600;flex-shrink:0}
+.fc-info{flex:1;min-width:0}
+.fc-name{font-size:14px;color:var(--text)}
+.fc-status{font-size:12px;color:var(--text-dim);margin-top:2px}
+.fc-badge{flex-shrink:0}
+
+/* 快捷操作 */
+.quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 14px}
+.quick-action{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:14px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer}
+.quick-action:active{background:var(--bg-card2)}
+.qa-icon{width:40px;height:40px;border-radius:10px;background:rgba(201,169,97,.15);display:flex;align-items:center;justify-content:center;font-size:22px;line-height:1}
+.qa-label{font-size:11px;color:var(--text-mid)}
+
+/* 房源列表 */
+.search-bar{padding:8px 14px;position:relative}
+.search-bar input{background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:9px 14px 9px 36px;font-size:13px;color:var(--text)}
+.search-bar .si{position:absolute;left:28px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:14px}
+.filter-tabs{display:flex;gap:6px;padding:0 14px 10px;overflow-x:auto;scrollbar-width:none}
+.filter-tabs::-webkit-scrollbar{display:none}
+.filter-tab{white-space:nowrap;padding:6px 14px;border-radius:20px;font-size:12px;background:var(--bg-card);color:var(--text-dim);border:1px solid var(--border);cursor:pointer}
+.filter-tab.active{background:rgba(201,169,97,.15);color:var(--gold);border-color:var(--gold-dark)}
+
+.property-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;cursor:pointer}
+.property-card:active{background:var(--bg-card2)}
+.pc-image{width:100%;height:160px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:56px;color:rgba(201,169,97,.3)}
+.pc-body{padding:12px}
+.pc-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.pc-name{font-size:15px;font-weight:600;color:var(--text)}
+.pc-price{font-size:17px;color:var(--gold);font-weight:700;flex-shrink:0}
+.pc-price .unit{font-size:12px;color:var(--text-dim);font-weight:400}
+.pc-meta{display:flex;gap:12px;font-size:12px;color:var(--text-dim);flex-wrap:wrap}
+.pc-meta span{display:flex;align-items:center;gap:3px}
+.pc-tags{margin-top:6px;display:flex;flex-wrap:wrap}
+.pc-stats{display:flex;gap:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:11px;color:var(--text-dim)}
+.pc-surroundings{display:flex;align-items:center;gap:4px;margin-top:6px;flex-wrap:wrap}
+.pc-surr-label{font-size:10px;color:var(--text-dim);margin-right:2px}
+.pc-surr-tag{display:inline-block;padding:1px 6px;border-radius:4px;font-size:10px;background:rgba(66,165,245,.12);color:var(--blue)}
+
+/* 带看列表卡片 */
+.viewing-list-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer}
+.viewing-list-card:active{background:var(--bg-card2)}
+.vlc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.vlc-prop{font-size:14px;font-weight:600;color:var(--text)}
+.vlc-time{font-size:12px;color:var(--gold);font-weight:500}
+.vlc-client{font-size:13px;color:var(--text-mid);margin-top:4px}
+.vlc-tags{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
+.tag-green{background:rgba(76,175,80,.15)!important;color:var(--green)!important}
+
+/* 分享卡片预览 */
+#shareCardPreview canvas{max-width:100%;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+
+/* 房源工作台(详情) */
+.detail-back{position:fixed;top:60px;left:14px;z-index:60;width:34px;height:34px;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;backdrop-filter:blur(10px);cursor:pointer}
+.detail-hero{height:200px;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-size:64px;color:rgba(201,169,97,.3)}
+.detail-info{padding:14px}
+.detail-info h1{font-size:20px;color:var(--text);margin-bottom:4px}
+.detail-info .d-price{font-size:24px;color:var(--gold);font-weight:700;margin:6px 0}
+.detail-info .d-price .unit{font-size:13px;color:var(--text-dim);font-weight:400}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border-radius:10px;overflow:hidden;margin:12px 0}
+.ig-item{background:var(--bg-card);padding:12px}
+.ig-label{font-size:11px;color:var(--text-dim);margin-bottom:3px}
+.ig-value{font-size:14px;color:var(--text);font-weight:500}
+
+/* 今日工作网格 */
+.work-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.work-grid-item{background:var(--bg-card2);border-radius:10px;padding:12px 8px;text-align:center}
+.wg-num{font-size:20px;color:var(--gold);font-weight:700}
+.wg-label{font-size:10px;color:var(--text-dim);margin-top:3px}
+
+/* 今日数据 - 两列布局 */
+.today-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.today-stat-item{background:var(--bg-card2);border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;border:1px solid transparent}
+.today-stat-item:active{background:rgba(201,169,97,.08);border-color:var(--gold-dark)}
+.ts-num{font-size:32px;color:var(--gold);font-weight:700;font-family:Georgia,serif}
+.ts-label{font-size:13px;color:var(--text);margin-top:4px;font-weight:500}
+.ts-sub{font-size:11px;color:var(--text-dim);margin-top:4px}
+
+/* 星级 */
+.stars{color:var(--gold);font-size:13px;letter-spacing:1px}
+
+/* 带看反馈 */
+.viewing-block{background:var(--bg-card2);border-radius:10px;padding:12px;margin-bottom:10px}
+.vb-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.vb-time{font-size:13px;color:var(--gold);font-weight:600}
+.vb-client{font-size:14px;color:var(--text);font-weight:500}
+.vb-row{display:flex;gap:8px;margin-top:6px}
+.vb-label{font-size:12px;color:var(--text-dim);width:40px;flex-shrink:0}
+.vb-content{font-size:13px;color:var(--text-mid);flex:1}
+
+/* 数据图表 */
+.chart-bars{display:flex;align-items:flex-end;justify-content:space-around;height:140px;padding:16px 6px;border-bottom:1px solid var(--border);gap:4px}
+.chart-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.cb-value{font-size:11px;color:var(--gold)}
+.cb-bar{width:70%;background:linear-gradient(180deg,var(--gold),var(--gold-dark));border-radius:4px 4px 0 0;min-height:4px;transition:height .5s}
+.cb-label{font-size:10px;color:var(--text-dim)}
+
+/* AI分析 */
+.ai-section{background:linear-gradient(135deg,rgba(201,169,97,.06),rgba(201,169,97,.02));border:1px solid rgba(201,169,97,.2);border-radius:12px;padding:14px}
+.ai-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--gold);background:rgba(201,169,97,.1);padding:3px 8px;border-radius:10px;margin-bottom:10px}
+.ai-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:13px}
+.ai-icon{flex-shrink:0;width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+/* 房东建议 */
+.suggestion-item{background:var(--bg-card2);border-radius:8px;padding:10px;margin-bottom:8px}
+.suggestion-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.suggestion-type{font-size:11px;color:var(--gold);background:rgba(201,169,97,.1);padding:2px 8px;border-radius:8px}
+.suggestion-actions{display:flex;gap:4px}
+.suggestion-text{font-size:13px;color:var(--text-mid);line-height:1.5}
+
+/* 今日看房计划 */
+.viewing-plan-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.viewing-plan-item:last-child{border-bottom:none}
+.viewing-plan-item:active{background:rgba(201,169,97,.05);border-radius:8px}
+.vpi-time{font-size:15px;color:var(--gold);font-weight:600;font-variant-numeric:tabular-nums;width:50px;flex-shrink:0}
+.vpi-info{flex:1;min-width:0}
+.vpi-name{font-size:14px;color:var(--text);font-weight:500}
+.vpi-price{font-size:12px;color:var(--text-dim);margin-top:2px}
+.vpi-status{font-size:11px;padding:3px 8px;border-radius:10px;flex-shrink:0}
+.vpi-status.done{background:rgba(102,187,106,.15);color:var(--green)}
+.vpi-status.pending{background:rgba(255,152,0,.15);color:var(--orange)}
+
+/* 推荐房源状态 */
+.rec-status-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:500;margin-left:6px}
+.rec-status-未推荐{background:rgba(136,136,136,.15);color:var(--text-dim)}
+.rec-status-已推荐{background:rgba(66,165,245,.15);color:var(--blue)}
+.rec-status-已预约{background:rgba(255,152,0,.15);color:var(--orange)}
+.rec-status-已带看{background:rgba(201,169,97,.15);color:var(--gold)}
+.rec-status-意向{background:rgba(102,187,106,.15);color:var(--green)}
+.rec-status-淘汰{background:rgba(136,136,136,.15);color:var(--text-dim);text-decoration:line-through}
+.rec-status-成交{background:rgba(201,169,97,.25);color:var(--gold-light)}
+.rec-actions{display:flex;gap:4px;margin-top:6px}
+.rec-action-btn{font-size:10px;padding:3px 8px;border-radius:6px;background:var(--bg-card2);color:var(--text-dim);border:1px solid var(--border)}
+.rec-action-btn:active{background:var(--border)}
+.rec-action-btn.danger{color:var(--red);border-color:rgba(229,57,53,.2)}
+
+/* 工作台卡片操作按钮 */
+.wc-actions{display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+.wc-action-btn{flex:1;padding:6px 4px;font-size:11px;border-radius:6px;background:var(--bg-card2);color:var(--text-mid);border:1px solid var(--border);text-align:center}
+.wc-action-btn:active{background:var(--border)}
+.wc-action-btn.danger{color:var(--red);border-color:rgba(229,57,53,.2)}
+.fc-actions{display:flex;gap:4px;flex-shrink:0;margin-left:4px}
+.fc-action-btn{padding:4px 8px;font-size:10px;border-radius:6px;background:var(--bg-card2);color:var(--text-dim);border:1px solid var(--border)}
+.fc-action-btn:active{background:var(--border)}
+.fc-action-btn.danger{color:var(--red);border-color:rgba(229,57,53,.2)}
+
+/* 打印样式 */
+@media print{
+  body *{visibility:hidden}
+  #reportOverlay,#reportOverlay *{visibility:visible}
+  #reportOverlay{position:absolute;top:0;left:0;background:#fff}
+  .form-sheet{max-height:none;overflow:visible;padding:20px}
+  .form-header,.form-footer{display:none!important}
+  .report-box{background:#fff;color:#000;font-family:serif;font-size:12pt;white-space:pre-wrap}
+}
+.ai-icon.up{background:rgba(102,187,106,.2);color:var(--green)}
+.ai-icon.down{background:rgba(239,83,83,.2);color:var(--red)}
+.ai-text{color:var(--text-mid);flex:1}
+
+/* 周报 */
+.report-box{background:var(--bg-card2);border-radius:10px;padding:14px;font-size:13px;color:var(--text-mid);line-height:1.8;white-space:pre-wrap;font-family:monospace}
+
+/* 客户列表 */
+.client-card{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer}
+.client-card:active{background:var(--bg-card2)}
+.cc-top{display:flex;align-items:center;gap:10px}
+.cc-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));display:flex;align-items:center;justify-content:center;font-size:16px;color:#1a1a1a;font-weight:600;flex-shrink:0}
+.cc-info{flex:1;min-width:0}
+.cc-name{font-size:15px;color:var(--text);font-weight:500}
+.cc-meta{font-size:12px;color:var(--text-dim);margin-top:2px}
+.cc-status{font-size:12px;color:var(--text-dim);margin-top:6px}
+
+/* 客户详情 */
+.cd-header{text-align:center;padding:24px 14px 14px;background:linear-gradient(135deg,#1a1a1a,#0d0d0d);border-bottom:1px solid var(--gold-dark)}
+.cd-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:28px;color:#1a1a1a;font-weight:700;border:3px solid rgba(201,169,97,.3)}
+.cd-name{font-size:20px;color:var(--gold-light);font-weight:600}
+.cd-level{margin-top:8px}
+
+/* 推荐房源 */
+.rec-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.rec-item:last-child{border-bottom:none}
+.rec-left{flex:1}
+.rec-name{font-size:14px;color:var(--text)}
+.rec-status{font-size:12px;color:var(--text-dim);margin-top:2px}
+.rec-stars{font-size:13px;color:var(--gold)}
+
+/* 跟进时间线 */
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--border)}
+.tl-item{position:relative;padding-bottom:14px;padding-left:16px}
+.tl-item::before{content:'';position:absolute;left:-17px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--bg-card)}
+.tl-type{font-size:12px;color:var(--gold);font-weight:500}
+.tl-content{font-size:13px;color:var(--text-mid);margin-top:3px}
+.tl-time{font-size:11px;color:var(--text-dim);margin-top:2px}
+
+/* 我的 */
+.profile-header{background:linear-gradient(135deg,#1a1a1a,#0d0d0d);padding:24px 20px;text-align:center;border-bottom:1px solid var(--gold-dark)}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:32px;color:#1a1a1a;font-weight:700;border:3px solid rgba(201,169,97,.3)}
+.profile-name{font-size:20px;color:var(--gold-light);font-weight:600}
+.profile-title{font-size:12px;color:var(--text-dim);margin-top:3px}
+.profile-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin:14px}
+.ps-item{background:var(--bg-card);padding:16px 10px;text-align:center}
+.ps-value{font-size:20px;color:var(--gold);font-weight:700}
+.ps-label{font-size:10px;color:var(--text-dim);margin-top:3px}
+
+.menu-list{background:var(--bg-card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
+.menu-item{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);cursor:pointer}
+.menu-item:last-child{border-bottom:none}
+.menu-item:active{background:var(--bg-card2)}
+.mi-left{display:flex;align-items:center;gap:10px}
+.mi-icon{width:30px;height:30px;border-radius:8px;background:rgba(201,169,97,.15);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold);font-weight:700;font-family:Georgia,serif}
+.mi-label{font-size:14px;color:var(--text)}
+.mi-right{font-size:12px;color:var(--text-dim)}
+
+/* FAB */
+.fab{position:fixed;right:16px;bottom:84px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#1a1a1a;font-size:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(201,169,97,.4);z-index:80;cursor:pointer}
+.fab:active{transform:scale(.92)}
+
+/* TabBar */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(13,13,13,.95);border-top:1px solid var(--border);z-index:100;display:flex;backdrop-filter:blur(20px);padding-bottom:env(safe-area-inset-bottom)}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-dim);font-size:10px;transition:color .2s;cursor:pointer}
+.tab-item.active{color:var(--gold)}
+.tab-icon{font-size:20px;line-height:1;font-weight:700;font-family:Georgia,serif}
+.tab-label{font-size:10px}
+
+/* 表单弹窗 */
+.form-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;backdrop-filter:blur(4px)}
+.form-overlay.active{display:flex;flex-direction:column}
+.form-sheet{background:var(--bg-card);border-radius:20px 20px 0 0;margin-top:auto;max-height:88vh;overflow-y:auto;animation:slideUp .3s ease;padding-bottom:80px}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.form-header{position:sticky;top:0;background:var(--bg-card);padding:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;z-index:10;border-radius:20px 20px 0 0}
+.form-header h2{font-size:16px;color:var(--gold-light)}
+.form-close{font-size:22px;color:var(--text-dim);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.form-body{padding:14px}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px}
+.form-group label .req{color:var(--red)}
+.form-input,.form-textarea,.form-select{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:10px;padding:11px 12px;font-size:14px;color:var(--text)}
+.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--gold-dark)}
+.form-textarea{min-height:70px;resize:vertical;line-height:1.5}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:34px}
+.form-row{display:flex;gap:10px}
+.form-row .form-group{flex:1}
+.level-picker,.rating-picker{display:flex;gap:6px;flex-wrap:wrap}
+.level-picker label,.rating-picker label{text-align:center;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg-input);font-size:13px;color:var(--text-dim);cursor:pointer;transition:all .2s;flex:1;min-width:60px}
+.level-picker label:has(input:checked),.rating-picker label:has(input:checked){border-color:var(--gold-dark);background:rgba(201,169,97,.1);color:var(--gold)}
+.level-picker input,.rating-picker input{display:none}
+.tag-input-area{display:flex;flex-wrap:wrap;gap:6px;padding:8px;background:var(--bg-input);border:1px solid var(--border);border-radius:10px;min-height:42px}
+.tag-input-area .tag{cursor:pointer}
+.tag-input-area .tag.selected{background:rgba(201,169,97,.3);color:var(--gold-light)}
+.image-upload{border:2px dashed var(--border);border-radius:10px;padding:16px;text-align:center;color:var(--text-dim);font-size:13px;cursor:pointer}
+.image-upload:active{border-color:var(--gold-dark)}
+.image-preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.image-preview{position:relative;aspect-ratio:1}
+.image-preview img{width:100%;height:100%;object-fit:cover;border-radius:8px}
+.image-preview .ip-remove{position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.form-footer{position:sticky;bottom:0;background:var(--bg-card);padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:10px}
+
+/* 图片查看器 */
+.image-viewer{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:300;display:none;align-items:center;justify-content:center}
+.image-viewer.active{display:flex}
+.image-viewer img{max-width:95%;max-height:90%;object-fit:contain;border-radius:8px}
+.image-viewer .iv-close{position:fixed;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);color:#fff;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+/* Toast */
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.85);color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+.scroll-content{min-height:calc(100vh - 124px)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="app-header">
+  <div class="brand">
+    <span class="logo">YUKI</span>
+    <div class="property-switch" id="propertySwitch" onclick="togglePropertyDropdown()">
+      <span class="name" id="currentPropertyName">--</span>
+      <span class="arrow">▼</span>
+    </div>
+  </div>
+  <div class="header-datetime">
+    <div class="time" id="headerTime">--:--</div>
+    <div class="date" id="headerDate">--</div>
+  </div>
+</header>
+<div class="property-dropdown" id="propertyDropdown"></div>
+
+<!-- 页面1: 工作台 -->
+<div class="page active" id="page-workbench">
+  <div class="scroll-content">
+    <div class="welcome"><h1 id="welcomeName">下午好</h1><p id="welcomeSub">今天又是美好的一天</p></div>
+    <div class="todo-columns">
+      <div class="section todo-col">
+        <div class="section-header"><h2>今日待办</h2><span class="sub" id="todoCount">0/0</span></div>
+        <div class="card"><div id="todoList"></div>
+          <button class="btn btn-outline btn-sm btn-full" style="margin-top:10px" onclick="openTodoForm(null,false)">+ 新增</button>
+        </div>
+      </div>
+      <div class="section todo-col">
+        <div class="section-header"><h2>明日待办</h2><span class="sub" id="tomorrowTodoCount">0项</span></div>
+        <div class="card"><div id="tomorrowTodoList"></div>
+          <button class="btn btn-outline btn-sm btn-full" style="margin-top:10px" onclick="openTodoForm(null,true)">+ 新增</button>
+        </div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header"><h2>重点房源</h2><span class="sub" id="focusPropCount">0套</span></div>
+      <div id="focusProperties"></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><h2>重点客户</h2><span class="sub" id="focusClientCount">0位</span></div>
+      <div class="card"><div id="focusClients"></div></div>
+    </div>
+    <div class="section">
+      <div class="section-header"><h2>快捷操作</h2></div>
+      <div class="quick-actions" id="quickActions"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 页面2: 房源 -->
+<div class="page" id="page-properties">
+  <div class="scroll-content">
+    <div class="search-bar"><span class="si">⌕</span><input type="text" placeholder="搜索房源..." oninput="filterProperties(this.value)"></div>
+    <div class="filter-tabs" id="propFilterTabs">
+      <div class="filter-tab active" onclick="filterPropBy('all',this)">全部</div>
+      <div class="filter-tab" onclick="filterPropBy('exclusive',this)">独家代理</div>
+      <div class="filter-tab" onclick="filterPropBy('在售',this)">出售中</div>
+      <div class="filter-tab" onclick="filterPropBy('已售',this)">已成交</div>
+    </div>
+    <div class="section" id="propertyList"></div>
+  </div>
+  <div class="fab" onclick="openPropertyForm()">+</div>
+</div>
+
+<!-- 带看列表页 -->
+<div class="page" id="page-viewings">
+  <div class="scroll-content">
+    <div class="detail-back" onclick="switchTab('profile')">‹</div>
+    <div class="section" style="padding-top:50px">
+      <div class="section-header"><h2>我的带看</h2><span class="sub" id="viewingListCount">0场</span></div>
+      <div class="filter-tabs" id="viewingFilterTabs" style="margin-bottom:12px">
+        <div class="filter-tab active" onclick="filterViewingBy('all',this)">全部</div>
+        <div class="filter-tab" onclick="filterViewingBy('today',this)">今日</div>
+        <div class="filter-tab" onclick="filterViewingBy('week',this)">本周</div>
+        <div class="filter-tab" onclick="filterViewingBy('month',this)">本月</div>
+      </div>
+      <div id="viewingListContainer"></div>
+    </div>
+  </div>
+  <div class="fab" onclick="openViewingForm()">+</div>
+</div>
+
+<!-- 房源工作台 -->
+<div class="page" id="page-property-detail">
+  <div class="scroll-content">
+    <div class="detail-back" onclick="switchTab('properties')">‹</div>
+    <div class="detail-hero" id="detailHero"></div>
+    <div class="detail-info" id="propertyDetailInfo"></div>
+  </div>
+</div>
+
+<!-- 页面3: 客户 -->
+<div class="page" id="page-clients">
+  <div class="scroll-content">
+    <div class="filter-tabs" id="clientFilterTabs" style="padding-top:10px">
+      <div class="filter-tab active" onclick="filterClientBy('all',this)">全部</div>
+      <div class="filter-tab" onclick="filterClientBy('A',this)">A级</div>
+      <div class="filter-tab" onclick="filterClientBy('B',this)">B级</div>
+      <div class="filter-tab" onclick="filterClientBy('C',this)">C级</div>
+      <div class="filter-tab" onclick="filterClientBy('成交',this)">成交</div>
+      <div class="filter-tab" onclick="filterClientBy('归档',this)">归档</div>
+    </div>
+    <div class="section" id="clientList"></div>
+  </div>
+  <div class="fab" onclick="openClientForm()">+</div>
+</div>
+
+<!-- 客户工作台 -->
+<div class="page" id="page-client-detail">
+  <div class="scroll-content">
+    <div class="detail-back" onclick="switchTab('clients')">‹</div>
+    <div id="clientDetailContent"></div>
+  </div>
+</div>
+
+<!-- 页面4: 我的 -->
+<div class="page" id="page-profile">
+  <div class="scroll-content">
+    <div class="profile-header" onclick="openAgentEditForm()" style="cursor:pointer">
+      <div class="profile-avatar" id="pfAvatar">Y</div>
+      <div class="profile-name" id="pfName">YUKI</div>
+      <div class="profile-title" id="pfTitle">豪宅独家代理经纪人</div>
+      <div style="font-size:11px;color:var(--gold);margin-top:6px">✏️ 点击编辑个人信息</div>
+    </div>
+    <div class="profile-stats" id="profileStats"></div>
+    <div class="section">
+      <div class="section-header"><h2>工具</h2></div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="openCalculator()"><div class="mi-left"><div class="mi-icon">¥</div><span class="mi-label">房贷计算器</span></div><span class="mi-right">›</span></div>
+        <div class="menu-item" onclick="exportData()"><div class="mi-left"><div class="mi-icon">↑</div><span class="mi-label">导出数据</span></div><span class="mi-right">›</span></div>
+        <div class="menu-item" onclick="document.getElementById('importFile').click()"><div class="mi-left"><div class="mi-icon">↓</div><span class="mi-label">导入数据</span></div><span class="mi-right">›</span></div>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-header"><h2>更多</h2></div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="switchTab('properties')"><div class="mi-left"><div class="mi-icon">▣</div><span class="mi-label">我的房源</span></div><span class="mi-right" id="mi-prop-count">›</span></div>
+        <div class="menu-item" onclick="switchTab('clients')"><div class="mi-left"><div class="mi-icon">◉</div><span class="mi-label">我的客户</span></div><span class="mi-right" id="mi-client-count">›</span></div>
+        <div class="menu-item" onclick="showViewingList()"><div class="mi-left"><div class="mi-icon">✎</div><span class="mi-label">我的带看</span></div><span class="mi-right" id="mi-viewing-count">›</span></div>
+        <div class="menu-item" onclick="showReportForCurrent()"><div class="mi-left"><div class="mi-icon">≡</div><span class="mi-label">我的周报</span></div><span class="mi-right">›</span></div>
+        <div class="menu-item" onclick="toast('营销中心开发中')"><div class="mi-left"><div class="mi-icon">★</div><span class="mi-label">营销中心</span></div><span class="mi-right">›</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="menu-list">
+        <div class="menu-item" onclick="clearAllData()"><div class="mi-left"><div class="mi-icon">×</div><span class="mi-label">清除所有数据</span></div><span class="mi-right">›</span></div>
+        <div class="menu-item" onclick="showAbout()"><div class="mi-left"><div class="mi-icon">i</div><span class="mi-label">关于</span></div><span class="mi-right">v5.0</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TabBar -->
+<nav class="tab-bar">
+  <div class="tab-item active" onclick="switchTab('workbench')"><span class="tab-icon">⌂</span><span class="tab-label">工作台</span></div>
+  <div class="tab-item" onclick="switchTab('properties')"><span class="tab-icon">▣</span><span class="tab-label">房源</span></div>
+  <div class="tab-item" onclick="switchTab('clients')"><span class="tab-icon">◉</span><span class="tab-label">客户</span></div>
+  <div class="tab-item" onclick="switchTab('profile')"><span class="tab-icon">◎</span><span class="tab-label">我的</span></div>
+</nav>
+
+<!-- 待办表单 -->
+<div class="form-overlay" id="todoFormOverlay"><div class="form-sheet">
+  <div class="form-header"><h2 id="todoFormTitle">新增待办</h2><div class="form-close" onclick="closeForm('todoFormOverlay')">×</div></div>
+  <div class="form-body">
+    <input type="hidden" id="tf_id">
+    <input type="hidden" id="tf_tomorrow" value="false">
+    <div class="form-row">
+      <div class="form-group"><label>开始时间</label><input type="time" class="form-input" id="tf_startTime"></div>
+      <div class="form-group"><label>结束时间</label><input type="time" class="form-input" id="tf_endTime"></div>
+    </div>
+    <div class="form-group"><label>待办类型</label><select class="form-select" id="tf_type"><option>带看</option><option>联系房东</option><option>回访</option><option>上传</option><option>生成周报</option><option>跟进</option><option>报价</option><option>议价</option></select></div>
+    <div class="form-group"><label>标题 <span class="req">*</span></label><input class="form-input" id="tf_title" placeholder="如：李先生复看西郊庄园"></div>
+    <div class="form-group"><label>关联房源</label><select class="form-select" id="tf_propertyId"><option value="">无</option></select></div>
+    <div class="form-group"><label>关联客户</label><select class="form-select" id="tf_clientId"><option value="">无</option></select></div>
+    <div class="form-group"><label>客户情况</label><textarea class="form-textarea" id="tf_clientStatus" placeholder="VIP客户，资金实力强..."></textarea></div>
+    <div class="form-group"><label>反馈/备注</label><textarea class="form-textarea" id="tf_feedback" placeholder="客户对房源的看法、需要跟进事项..."></textarea></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-danger" id="tf_deleteBtn" style="display:none" onclick="deleteTodoFromForm()">删除</button><button class="btn btn-secondary btn-full" onclick="closeForm('todoFormOverlay')">取消</button><button class="btn btn-primary btn-full" onclick="saveTodo()">保存</button></div>
+</div></div>
+
+<!-- 房源表单 -->
+<div class="form-overlay" id="propertyFormOverlay"><div class="form-sheet">
+  <div class="form-header"><h2 id="propertyFormTitle">新增房源</h2><div class="form-close" onclick="closeForm('propertyFormOverlay')">×</div></div>
+  <div class="form-body">
+    <input type="hidden" id="pf_id">
+    <div class="form-group"><label>房源名称 <span class="req">*</span></label><input class="form-input" id="pf_name" placeholder="如：西郊庄园18号"></div>
+    <div class="form-group"><label>地址</label><input class="form-input" id="pf_address" placeholder="详细地址"></div>
+    <div class="form-row">
+      <div class="form-group"><label>面积（㎡）</label><input type="number" class="form-input" id="pf_area" placeholder="328"></div>
+      <div class="form-group"><label>总价（万）</label><input type="number" class="form-input" id="pf_price" placeholder="6800"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>户型</label><input class="form-input" id="pf_layout" placeholder="5室3厅"></div>
+      <div class="form-group"><label>楼层</label><input class="form-input" id="pf_floor" placeholder="独栋/高层"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>类型</label><select class="form-select" id="pf_type"><option>大平层</option><option>别墅</option><option>复式</option><option>公寓</option><option>洋房</option></select></div>
+      <div class="form-group"><label>状态</label><select class="form-select" id="pf_status"><option>在售</option><option>预订</option><option>已售</option></select></div>
+    </div>
+    <div class="form-group"><label>独家代理</label><select class="form-select" id="pf_exclusive"><option value="true">是</option><option value="false">否</option></select></div>
+    <div class="form-row">
+      <div class="form-group"><label>物业费（元/㎡/月）</label><input type="number" class="form-input" id="pf_fee" placeholder="12"></div>
+      <div class="form-group"><label>装修</label><select class="form-select" id="pf_decoration"><option value="">未选择</option><option>毛坯</option><option>简装</option><option>精装</option><option>豪装</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>朝向</label><select class="form-select" id="pf_orientation"><option value="">未选择</option><option>南北</option><option>朝南</option><option>朝北</option><option>东西</option></select></div>
+      <div class="form-group"><label>车位</label><input class="form-input" id="pf_parking" placeholder="如：3个"></div>
+    </div>
+    <div class="form-group"><label>卖点（逗号分隔）</label><input class="form-input" id="pf_highlights" placeholder="独栋别墅,大花园,南北通透"></div>
+    <div class="form-group"><label>标签（逗号分隔）</label><input class="form-input" id="pf_tags" placeholder="学区,精装"></div>
+    <div class="form-group"><label>配套（逗号分隔）</label><input class="form-input" id="pf_facilities" placeholder="泳池,健身房"></div>
+    <div class="form-group"><label>描述</label><textarea class="form-textarea" id="pf_description" placeholder="房源亮点描述..."></textarea></div>
+    <div class="form-group"><label>房东心态</label><textarea class="form-textarea" id="pf_ownerMindset" placeholder="如：房东心态稳定，不急售，价格可谈空间3-5%..."></textarea></div>
+    <div class="form-group"><label>国际学校（逗号分隔）</label><input class="form-input" id="pf_schools" placeholder="上海美国学校（约800m）,英国学校（2km内）"></div>
+    <div class="form-group"><label>医疗资源（逗号分隔）</label><input class="form-input" id="pf_medical" placeholder="新虹桥国际医学中心,华山医院西院"></div>
+    <div class="form-group"><label>交通（逗号分隔）</label><input class="form-input" id="pf_transport" placeholder="地铁17号线诸光路站（约1km）,2号线徐泾东站"></div>
+    <div class="form-group"><label>商业配套（逗号分隔）</label><input class="form-input" id="pf_commercial" placeholder="丰尚国际广场,Costco开市客"></div>
+    <div class="form-group"><label>生活配套（逗号分隔）</label><input class="form-input" id="pf_life" placeholder="盒马鲜生(800m),星巴克(500m)"></div>
+    <div class="form-group"><label>房源图片</label><div style="font-size:11px;color:var(--text-dim);margin-bottom:6px">点击图片下方"设为封面"可指定展示图，带金色边框的为当前封面</div><div class="image-upload" onclick="document.getElementById('pf_images').click()">⊕ 点击上传图片</div><input type="file" id="pf_images" accept="image/*" multiple style="display:none" onchange="handlePropertyImages(event)"><div class="image-preview-grid" id="pf_imagePreview"></div></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-secondary btn-full" onclick="closeForm('propertyFormOverlay')">取消</button><button class="btn btn-primary btn-full" onclick="saveProperty()">保存</button></div>
+</div></div>
+
+<!-- 带看表单 -->
+<div class="form-overlay" id="viewingFormOverlay"><div class="form-sheet">
+  <div class="form-header"><h2 id="viewingFormTitle">新增带看</h2><div class="form-close" onclick="closeForm('viewingFormOverlay')">×</div></div>
+  <div class="form-body">
+    <input type="hidden" id="vf_id"><input type="hidden" id="vf_clientId">
+    <div class="form-group"><label>关联房源 <span class="req">*</span></label><select class="form-select" id="vf_propertyId"></select></div>
+    <div class="form-row">
+      <div class="form-group"><label>代看经纪公司</label><input class="form-input" id="vf_agencyCompany" placeholder="如：德佑地产"></div>
+      <div class="form-group"><label>代看经纪人</label><input class="form-input" id="vf_agentName" placeholder="如：赵经理"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>经纪人电话</label><input type="tel" class="form-input" id="vf_agentPhone" placeholder="手机号"></div>
+      <div class="form-group"><label>客户姓名 <span class="req">*</span></label><input class="form-input" id="vf_clientName" placeholder="客户姓名"></div>
+    </div>
+    <div class="form-group"><label>客户大概情况</label><textarea class="form-textarea" id="vf_clientProfile" placeholder="如：企业高管，投资型客户，预算3000万左右，资金实力强"></textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>带看时间 <span class="req">*</span></label><input type="datetime-local" class="form-input" id="vf_viewingTime"></div>
+      <div class="form-group"><label>时长（分钟）</label><input type="number" class="form-input" id="vf_duration" value="60"></div>
+    </div>
+    <div class="form-group"><label>星级评价</label>
+      <div class="rating-picker">
+        <label><input type="radio" name="rating" value="1"><span>★1</span></label>
+        <label><input type="radio" name="rating" value="2"><span>★2</span></label>
+        <label><input type="radio" name="rating" value="3"><span>★3</span></label>
+        <label><input type="radio" name="rating" value="4" checked><span>★4</span></label>
+        <label><input type="radio" name="rating" value="5"><span>★5</span></label>
+      </div>
+    </div>
+    <div class="form-group"><label>喜欢的点（逗号分隔）</label><input class="form-input" id="vf_likes" placeholder="如：花园,客厅,朝向"></div>
+    <div class="form-group"><label>不足之处（逗号分隔）</label><input class="form-input" id="vf_dislikes" placeholder="如：价格偏高,厨房偏小"></div>
+    <div class="form-group"><label>现场反馈</label><textarea class="form-textarea" id="vf_feedback" placeholder="客户看房后的整体评价和反应..."></textarea></div>
+    <div class="form-group"><label>下一步计划</label><textarea class="form-textarea" id="vf_followUp" placeholder="后续跟进安排..."></textarea></div>
+    <div class="form-group"><label>备注</label><textarea class="form-textarea" id="vf_notes" placeholder="其他需要记录的事项..."></textarea></div>
+    <div class="form-group"><label>附件</label><div class="image-upload" onclick="document.getElementById('vf_attachments').click()">⊕ 上传图片</div><input type="file" id="vf_attachments" accept="image/*" multiple style="display:none" onchange="handleViewingAttachments(event)"><div class="image-preview-grid" id="vf_attachPreview"></div></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-danger" id="vf_deleteBtn" style="display:none" onclick="deleteViewingFromForm()">删除</button><button class="btn btn-secondary btn-full" onclick="closeForm('viewingFormOverlay')">取消</button><button class="btn btn-primary btn-full" onclick="saveViewing()">保存</button></div>
+</div></div>
+
+<!-- 客户表单 -->
+<div class="form-overlay" id="clientFormOverlay"><div class="form-sheet">
+  <div class="form-header"><h2 id="clientFormTitle">新增客户</h2><div class="form-close" onclick="closeForm('clientFormOverlay')">×</div></div>
+  <div class="form-body">
+    <input type="hidden" id="cf_id">
+    <div class="form-row">
+      <div class="form-group"><label>姓名 <span class="req">*</span></label><input class="form-input" id="cf_name" placeholder="客户姓名"></div>
+      <div class="form-group"><label>电话</label><input type="tel" class="form-input" id="cf_phone" placeholder="手机号"></div>
+    </div>
+    <div class="form-group"><label>客户等级</label>
+      <div class="level-picker">
+        <label><input type="radio" name="clevel" value="A" checked><span>A级</span></label>
+        <label><input type="radio" name="clevel" value="B"><span>B级</span></label>
+        <label><input type="radio" name="clevel" value="C"><span>C级</span></label>
+        <label><input type="radio" name="clevel" value="成交"><span>成交</span></label>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>预算（万）</label><input type="number" class="form-input" id="cf_budget" placeholder="3000"></div>
+      <div class="form-group"><label>客户类型</label><select class="form-select" id="cf_type"><option>投资</option><option>自住</option><option>改善</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>意向区域</label><input class="form-input" id="cf_area" placeholder="如：浦东"></div>
+      <div class="form-group"><label>户型需求</label><input class="form-input" id="cf_layout" placeholder="如：4室2厅"></div>
+    </div>
+    <div class="form-group"><label>付款方式</label><input class="form-input" id="cf_payment" placeholder="如：全款/按揭"></div>
+    <div class="form-group"><label>家庭情况</label><input class="form-input" id="cf_family" placeholder="如：一家三口"></div>
+    <div class="form-group"><label>职业</label><input class="form-input" id="cf_job" placeholder="如：企业高管"></div>
+    <div class="form-group"><label>需求</label><textarea class="form-textarea" id="cf_requirements" placeholder="客户具体需求..."></textarea></div>
+    <div class="form-group"><label>备注</label><textarea class="form-textarea" id="cf_notes" placeholder="其他备注..."></textarea></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-secondary btn-full" onclick="closeForm('clientFormOverlay')">取消</button><button class="btn btn-primary btn-full" onclick="saveClient()">保存</button></div>
+</div></div>
+
+<!-- 跟进记录表单 -->
+<div class="form-overlay" id="followUpFormOverlay"><div class="form-sheet">
+  <div class="form-header"><h2 id="followUpFormTitle">新增跟进</h2><div class="form-close" onclick="closeForm('followUpFormOverlay')">×</div></div>
+  <div class="form-body">
+    <input type="hidden" id="fuf_id"><input type="hidden" id="fuf_clientId">
+    <div class="form-group"><label>跟进类型 <span class="req">*</span></label><select class="form-select" id="fuf_type"><option>电话</option><option>微信</option><option>见面</option><option>带看</option><option>报价</option><option>签约</option></select></div>
+    <div class="form-group"><label>跟进内容 <span class="req">*</span></label><textarea class="form-textarea" id="fuf_content" placeholder="记录跟进详情..."></textarea></div>
+    <div class="form-group"><label>跟进时间</label><input type="datetime-local" class="form-input" id="fuf_time"></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-danger" id="fuf_deleteBtn" style="display:none" onclick="deleteFollowUpFromForm()">删除</button><button class="btn btn-secondary btn-full" onclick="closeForm('followUpFormOverlay')">取消</button><button class="btn btn-primary btn-full" onclick="saveFollowUp()">保存</button></div>
+</div></div>
+
+<!-- 经纪人信息编辑表单 -->
+<div class="form-overlay" id="agentFormOverlay"><div class="form-sheet">
+  <div class="form-header"><h2>编辑经纪人信息</h2><div class="form-close" onclick="closeForm('agentFormOverlay')">×</div></div>
+  <div class="form-body">
+    <div class="form-group"><label>头像（首字或Emoji）</label><input class="form-input" id="af_avatar" placeholder="如 Y 或 📱"></div>
+    <div class="form-group"><label>姓名 <span class="req">*</span></label><input class="form-input" id="af_name" placeholder="如 YUKI"></div>
+    <div class="form-group"><label>职位</label><input class="form-input" id="af_title" placeholder="如 豪宅独家代理经纪人"></div>
+    <div class="form-group"><label>公司</label><input class="form-input" id="af_company" placeholder="如 YUKI Luxury Properties"></div>
+    <div class="form-group"><label>联系电话</label><input type="tel" class="form-input" id="af_phone" placeholder="如 139-0000-8888"></div>
+    <div class="form-group"><label>微信号</label><input class="form-input" id="af_wechat" placeholder="如 YUKI_luxury"></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-secondary btn-full" onclick="closeForm('agentFormOverlay')">取消</button><button class="btn btn-primary btn-full" onclick="saveAgent()">保存</button></div>
+</div></div>
+
+<!-- 房源跟进情况编辑表单 -->
+<div class="form-overlay" id="propFollowUpFormOverlay"><div class="form-sheet">
+  <div class="form-header"><h2 id="propFollowUpFormTitle">新增跟进</h2><div class="form-close" onclick="closeForm('propFollowUpFormOverlay')">×</div></div>
+  <div class="form-body">
+    <input type="hidden" id="pfu_id"><input type="hidden" id="pfu_propId">
+    <div class="form-group"><label>跟进类型 <span class="req">*</span></label><select class="form-select" id="pfu_type"><option>电话</option><option>微信</option><option>见面</option><option>带看反馈</option><option>报价沟通</option><option>签约进展</option></select></div>
+    <div class="form-group"><label>沟通对象</label><select class="form-select" id="pfu_target"><option>房东</option><option>买家</option><option>中介同行</option><option>其他</option></select></div>
+    <div class="form-group"><label>跟进内容 <span class="req">*</span></label><textarea class="form-textarea" id="pfu_content" placeholder="记录与房东/买家沟通的详细内容..."></textarea></div>
+    <div class="form-group"><label>跟进时间</label><input type="datetime-local" class="form-input" id="pfu_time"></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-danger" id="pfu_deleteBtn" style="display:none" onclick="deletePropFollowUpFromForm()">删除</button><button class="btn btn-secondary btn-full" onclick="closeForm('propFollowUpFormOverlay')">取消</button><button class="btn btn-primary btn-full" onclick="savePropFollowUp()">保存</button></div>
+</div></div>
+
+<!-- 周边配套编辑表单 -->
+<div class="form-overlay" id="surroundingFormOverlay"><div class="form-sheet">
+  <div class="form-header"><h2 id="surroundingFormTitle">新增周边配套</h2><div class="form-close" onclick="closeForm('surroundingFormOverlay')">×</div></div>
+  <div class="form-body">
+    <input type="hidden" id="sf_propId"><input type="hidden" id="sf_cat"><input type="hidden" id="sf_idx">
+    <div class="form-group"><label>分类 <span class="req">*</span></label>
+      <select class="form-select" id="sf_category">
+        <option value="transport">🚇 交通</option>
+        <option value="schools">🏫 国际学校</option>
+        <option value="commercial">🛍 商业</option>
+        <option value="medical">🏥 医疗</option>
+        <option value="life">🌳 生活</option>
+      </select>
+    </div>
+    <div class="form-group"><label>名称 <span class="req">*</span></label><input class="form-input" id="sf_name" placeholder="如 地铁17号线诸光路站（约1km）"></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-danger" id="sf_deleteBtn" style="display:none" onclick="deleteSurroundingFromForm()">删除</button><button class="btn btn-secondary btn-full" onclick="closeForm('surroundingFormOverlay')">取消</button><button class="btn btn-primary btn-full" onclick="saveSurrounding()">保存</button></div>
+</div></div>
+
+<!-- 房贷计算器 -->
+<div class="form-overlay" id="calcOverlay"><div class="form-sheet">
+  <div class="form-header"><h2>房贷计算器</h2><div class="form-close" onclick="closeForm('calcOverlay')">×</div></div>
+  <div class="form-body">
+    <div class="form-group"><label>房价总额（万）</label><input type="number" class="form-input" id="calc_price" value="6800"></div>
+    <div class="form-row">
+      <div class="form-group"><label>首付比例（%）</label><input type="number" class="form-input" id="calc_downRate" value="30"></div>
+      <div class="form-group"><label>贷款年限</label><input type="number" class="form-input" id="calc_years" value="30"></div>
+    </div>
+    <div class="form-group"><label>年利率（%）</label><input type="number" class="form-input" id="calc_rate" value="4.1" step="0.01"></div>
+    <button class="btn btn-primary btn-full" onclick="calculateLoan()">计算</button>
+    <div class="calc-result hidden" id="calcResult" style="background:linear-gradient(135deg,rgba(201,169,97,.1),rgba(201,169,97,.02));border:1px solid var(--gold-dark);border-radius:12px;padding:16px;text-align:center;margin-top:14px"></div>
+  </div>
+  <div class="form-footer"><button class="btn btn-secondary btn-full" onclick="closeForm('calcOverlay')">关闭</button></div>
+</div></div>
+
+<!-- 周报导出 -->
+<div class="form-overlay" id="reportOverlay"><div class="form-sheet">
+  <div class="form-header"><h2>房东周报</h2><div class="form-close" onclick="closeForm('reportOverlay')">×</div></div>
+  <div class="form-body">
+    <div class="report-box" id="reportContent"></div>
+  </div>
+  <div class="form-footer" style="flex-direction:column;gap:8px">
+    <button class="btn btn-primary btn-full" onclick="copyReport()">复制全文</button>
+    <div style="display:flex;gap:8px;width:100%">
+      <button class="btn btn-secondary btn-full" onclick="printReport()">PDF导出</button>
+      <button class="btn btn-secondary btn-full" onclick="shareReportToWeChat()">微信发送</button>
+      <button class="btn btn-secondary btn-full" onclick="emailReport()">邮件发送</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- 房源分享卡片预览 -->
+<div class="form-overlay" id="shareCardOverlay"><div class="form-sheet">
+  <div class="form-header"><h2>房源推荐卡</h2><div class="form-close" onclick="closeForm('shareCardOverlay')">×</div></div>
+  <div class="form-body" style="text-align:center">
+    <div id="shareCardPreview" style="display:flex;justify-content:center;margin-bottom:14px"></div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary btn-full" onclick="copyShareCardImage()">复制图片</button>
+      <button class="btn btn-primary btn-full" onclick="saveShareCardImage()">保存图片</button>
+    </div>
+    <div style="font-size:11px;color:var(--text-dim);margin-top:10px">长按图片或点击保存按钮可下载</div>
+  </div>
+</div></div>
+
+<!-- 图片查看器 -->
+<div class="image-viewer" id="imageViewer" onclick="closeImageViewer()"><div class="iv-close">×</div><img id="viewerImg" src=""></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 全局状态 =====
+let state = {
+  properties: [], clients: [], viewings: [], todos: [], followUps: [],
+  currentPropertyId: null, currentTab: 'workbench',
+  propertyFilter: 'all', clientFilter: 'all', propSearch: '',
+  tempPropImages: [], tempViewingAttachments: [],
+  agent: { name: 'YUKI', title: '豪宅独家代理经纪人', company: 'YUKI Luxury Properties', phone: '139-0000-8888', wechat: 'YUKI_luxury', avatar: '' }
+};
+
+// ===== 工具函数 =====
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5)}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+function formatDate(d){const dt=new Date(d);return`${dt.getMonth()+1}月${dt.getDate()}日 周${'日一二三四五六'[dt.getDay()]}`}
+function formatTime(d){const dt=new Date(d);return`${dt.getMonth()+1}/${dt.getDate()} ${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`}
+function formatTimeShort(d){const dt=new Date(d);return`${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`}
+function formatPrice(wan){return wan>=10000?(wan/10000).toFixed(1)+'亿':wan+'万'}
+function formatPriceHTML(wan){return wan>=10000?`<span style="color:var(--gold);font-weight:700">${(wan/10000).toFixed(1)}亿</span>`:`<span style="color:var(--gold);font-weight:700">${wan}</span><span style="font-size:12px;color:var(--text-dim);font-weight:400">万</span>`}
+function getProp(id){return state.properties.find(p=>p.id===id)}
+function getPropName(id){const p=getProp(id);return p?p.name:'未知房源'}
+function getClient(id){return state.clients.find(c=>c.id===id)}
+function isToday(d){return new Date(d).toDateString()===new Date().toDateString()}
+function isThisWeek(d){const dt=new Date(d);const now=new Date();const diff=(now-dt)/(1000*60*60*24);return diff<=7&&diff>=0}
+
+// ===== 数据持久化 =====
+const STORAGE_KEY='yuki_agent_workspace_v2';
+const DATA_VERSION='v7'; // 每次更新改动此版本号可触发数据迁移
+function saveState(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({properties:state.properties,clients:state.clients,viewings:state.viewings,todos:state.todos,followUps:state.followUps,currentPropertyId:state.currentPropertyId,agent:state.agent,version:DATA_VERSION}))}catch(e){console.error(e);toast('存储空间不足')}}
+function loadState(){
+  const s=localStorage.getItem(STORAGE_KEY);
+  if(s){try{
+    const d=JSON.parse(s);
+    state.properties=d.properties||[];
+    state.clients=d.clients||[];
+    state.viewings=d.viewings||[];
+    state.todos=d.todos||[];
+    state.followUps=d.followUps||[];
+    state.currentPropertyId=d.currentPropertyId||(state.properties[0]?.id||null);
+    state.agent=d.agent||state.agent;
+    // 数据迁移：确保旧数据的房源有新字段
+    state.properties.forEach(p=>{
+      if(!p.followUps)p.followUps=[];
+      if(p.coverIndex===undefined)p.coverIndex=0;
+      if(!p.suggestions)p.suggestions=[];
+      if(!p.stats)p.stats={views:0,favorites:0,inquiries:0,bookings:0,shares:0};
+      if(!p.surroundings)p.surroundings={};
+    });
+    return true;
+  }catch(e){console.error(e)}}return false
+}
+
+// ===== 预置数据 =====
+function initSampleData(){
+  const p1=uid(),p2=uid(),p3=uid(),p4=uid();
+  const c1=uid(),c2=uid(),c3=uid(),c4=uid(),c5=uid();
+  const now=new Date();
+  const today=(h,m)=>{const d=new Date();d.setHours(h,m,0,0);return d.toISOString()};
+  const dayOffset=(days,h=10,m=0)=>{const d=new Date();d.setDate(d.getDate()+days);d.setHours(h,m,0,0);return d.toISOString()};
+
+  // 生成预置房源封面图（SVG data URI，轻量无网络依赖）
+  const coverImg=(title,sub,c1,c2)=>'data:image/svg+xml,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${c1}"/><stop offset="100%" style="stop-color:${c2}"/></linearGradient></defs><rect width="600" height="400" fill="url(#g)"/><text x="300" y="180" text-anchor="middle" font-family="Georgia,serif" font-size="28" fill="rgba(255,255,255,0.9)" font-weight="bold">${title}</text><text x="300" y="220" text-anchor="middle" font-family="sans-serif" font-size="14" fill="rgba(255,255,255,0.6)">${sub}</text><circle cx="300" cy="330" r="28" fill="rgba(201,169,97,0.3)"/><text x="300" y="338" text-anchor="middle" font-size="24" fill="#c9a961" font-family="Georgia,serif">◆</text></svg>`);
+
+  state.properties=[
+    {id:p1,name:'西郊庄园',address:'闵行区华漕镇金丰路588弄',type:'别墅',area:328,price:6800,layout:'5室3厅4卫',floor:'独栋3层',status:'在售',exclusive:true,
+     tags:['独家代理','独栋别墅','大花园'],highlights:['独栋别墅','500㎡花园','南北通透','全屋地暖'],facilities:['泳池','健身房','酒窖'],
+     parking:'3个车位',images:[coverImg('西郊庄园','独栋别墅 · 328㎡','#1a3a2e','#0d1f17')],coverIndex:0,description:'大虹桥华漕国际社区独栋别墅，500平米私家花园，南北通透，全屋进口精装，配套泳池健身房。',
+     ownerMindset:'房东心态稳定，不急售，价格可谈空间3-5%，看重买家付款方式',
+     fee:'12',decoration:'豪装',orientation:'南北',
+     surroundings:{
+       schools:['上海美国学校（约800m）','英国学校（2km内）','新加坡国际学校（2km内）','韩国学校（2km内）'],
+       medical:['新虹桥国际医学中心（一路之隔）','华山医院西院（约3km）'],
+       transport:['地铁17号线诸光路站（约1km）','2号线徐泾东站（约2km）','嘉闵高架/北翟高架直达虹桥枢纽'],
+       commercial:['丰尚国际广场（约1.4km）','Costco开市客','蟠龙天地'],
+       life:['盒马鲜生（约1km）','星巴克（约800m）','华漕社区公园（约500m）']
+     },
+     followUps:[
+       {id:uid(),type:'电话',target:'房东',content:'房东确认价格可谈空间3-5%，希望买家全款或高首付，下周安排意向客户见面沟通',time:dayOffset(-2,15,0),createTime:dayOffset(-2,15,0)},
+       {id:uid(),type:'微信',target:'房东',content:'发送了最新带看照片和客户反馈，房东表示满意，同意调整挂牌价至6750万',time:dayOffset(-1,10,0),createTime:dayOffset(-1,10,0)}
+     ],
+     stats:{favorites:35,inquiries:18,bookings:6,shares:12,views:0},videoUrl:'',vrUrl:'',floorPlan:'',createTime:now.toISOString()},
+    {id:p2,name:'湖畔佳苑',address:'青浦区徐泾镇沪青平公路1517弄',type:'大平层',area:268,price:5800,layout:'4室2厅3卫',floor:'高层/22层',status:'在售',exclusive:true,
+     tags:['独家代理','湖景','湖景房'],highlights:['一线湖景','270°观湖','精装交付','配套齐全'],facilities:['会所','湖畔步道','健身房'],
+     parking:'2个车位',images:[coverImg('湖畔佳苑','一线湖景 · 268㎡','#1a2a4e','#0d1526')],coverIndex:0,description:'青浦徐泾别墅区一线湖景房，270度观湖视野，全屋精装，配套高端会所和湖畔步道。',
+     ownerMindset:'房东置换升级，有一定议价空间，希望快速成交',
+     fee:'8',decoration:'精装',orientation:'朝南',
+     surroundings:{
+       schools:['德法学校（紧邻）','西华国际学校（约1km）','美国学校/英国学校（约3km）'],
+       medical:['远大健康城（约2km）','京汇医院（约2km）'],
+       transport:['地铁2号线徐泾东站（约1.5km）','17号线诸光路站（约2km）','沪青平公路/A9高速'],
+       commercial:['夏都小镇（约700m）','永业购物中心','家乐福徐泾店'],
+       life:['夏都小镇餐饮街（约700m）','盒马鲜生（约1.2km）','银涛高尔夫球场（约3km）']
+     },
+     stats:{favorites:28,inquiries:14,bookings:4,shares:10,views:0},videoUrl:'',vrUrl:'',floorPlan:'',createTime:now.toISOString()},
+    {id:p3,name:'仁恒西郊花园',address:'青浦区徐泾镇徐盈路1188弄',type:'花园洋房',area:215,price:4500,layout:'4室2厅2卫',floor:'底层/带花园',status:'在售',exclusive:true,
+     tags:['独家代理','花园洋房','带花园'],highlights:['私家庭院','一楼入户','南北通透','品质物业'],facilities:['花园','会所','亲子游乐区'],
+     parking:'2个车位',images:[coverImg('仁恒西郊花园','花园洋房 · 215㎡','#2e1a3e','#1a0d1f')],coverIndex:0,description:'徐泾稀缺花园洋房，一楼带私人庭院，南北通透，配套品牌物业，适合家庭居住。',
+     ownerMindset:'房东诚意出售，价格可谈，配合度高',
+     fee:'6',decoration:'精装',orientation:'南北',
+     surroundings:{
+       schools:['青浦世界外国语学校（约1km）','宋庆龄学校','西华国际学校（3km内）'],
+       medical:['德达医院（约2km）','远大健康城（约3km）'],
+       transport:['地铁17号线徐盈路站（约300m，步行5分钟）','17号线徐泾东'],
+       commercial:['万科天空之城广场（约260m）','蟠龙天地（约1.6km）','鹤森生活广场（约500m）'],
+       life:['万科天空之城（约260m）','星巴克（约400m）','徐盈路社区公园（约500m）']
+     },
+     stats:{favorites:42,inquiries:22,bookings:8,shares:18,views:0},videoUrl:'',vrUrl:'',floorPlan:'',createTime:now.toISOString()},
+    {id:p4,name:'西庭网球俱乐部',address:'闵行区华漕镇金丰路555弄',type:'俱乐部',area:380,price:8500,layout:'多功能厅',floor:'独栋',status:'在售',exclusive:true,
+     tags:['独家代理','俱乐部','高端会所'],highlights:['稀缺俱乐部资产','室内网球场','多功能厅','VIP会员资源'],facilities:['室内网球场','健身房','餐厅','停车场'],
+     parking:'20个车位',images:[coverImg('西庭网球俱乐部','高端会所 · 380㎡','#3e2a1a','#1f150d')],coverIndex:0,description:'华漕国际社区稀缺俱乐部资产，独栋建筑，含室内网球场、多功能厅和VIP配套，适合高端圈层社交和投资。',
+     ownerMindset:'稀缺资产，房东惜售，议价空间有限，适合长期持有',
+     fee:'15',decoration:'简装',orientation:'南北',
+     surroundings:{
+       schools:['上海美国学校（步行5分钟）','英国学校','新加坡国际学校（均500m内）'],
+       medical:['华山医院西院（约2km）','新虹桥国际医学中心','和睦家门诊（约3km）'],
+       transport:['地铁17号线诸光路站（约1.8km）','2号线徐泾东站（约1.6km）','13号线（建设中）'],
+       commercial:['丰尚国际广场','Costco开市客','大润发华漕店'],
+       life:['丰尚国际广场餐饮（约1km）','星巴克（约800m）','华漕大绿地公园（约1.5km）']
+     },
+     stats:{favorites:18,inquiries:10,bookings:3,shares:6,views:0},videoUrl:'',vrUrl:'',floorPlan:'',createTime:now.toISOString()}
+  ];
+
+  state.clients=[
+    {id:c1,name:'李先生',phone:'139-1234-5678',level:'A',budget:3000,type:'投资',area:'长宁',layout:'4室以上',payment:'按揭',family:'一家三口',job:'企业高管',requirements:'投资用途，看重升值潜力',notes:'资金实力强，决策快',recommended:[p1],viewed:[{propertyId:p1,count:4}],favorited:[],nextAction:{type:'带看',time:today(14,0),propertyId:p1,note:'第二次复看西郊庄园'},createTime:now.toISOString()},
+    {id:c2,name:'王女士',phone:'138-5678-9012',level:'A',budget:5000,type:'自住',area:'浦东',layout:'4室2厅',payment:'全款',family:'一家四口',job:'金融从业',requirements:'自住，需要学区',notes:'全款客户，看重品质',recommended:[p2,p3],viewed:[{propertyId:p2,count:2}],favorited:[p3],nextAction:{type:'回访',time:today(13,0),propertyId:p2,note:'确认是否需要议价'},createTime:now.toISOString()},
+    {id:c3,name:'陈先生',phone:'137-1111-2222',level:'B',budget:4000,type:'改善',area:'不限',layout:'4室2厅',payment:'按揭',family:'一家三口',job:'私企业主',requirements:'改善住房，需要大花园',notes:'对花园有执念',recommended:[p1],viewed:[{propertyId:p1,count:1}],favorited:[],nextAction:{type:'报价',time:dayOffset(1,11,0),propertyId:p1,note:'准备报价方案'},createTime:now.toISOString()},
+    {id:c4,name:'张总',phone:'136-3333-4444',level:'B',budget:8000,type:'投资',area:'浦东',layout:'不限',payment:'全款',family:'一家两口',job:'投资人',requirements:'高端投资',notes:'资金灵活',recommended:[p2],viewed:[{propertyId:p2,count:3}],favorited:[p2],nextAction:{type:'联系',time:dayOffset(2,10,0),propertyId:p2,note:'跟进议价结果'},createTime:now.toISOString()},
+    {id:c5,name:'刘女士',phone:'135-5555-6666',level:'C',budget:2500,type:'自住',area:'浦东',layout:'3室2厅',payment:'按揭',family:'一家三口',job:'教师',requirements:'刚需自住',notes:'预算有限',recommended:[p3],viewed:[],favorited:[],nextAction:{type:'带看',time:dayOffset(3,14,0),propertyId:p3,note:'首次看房'},createTime:now.toISOString()}
+  ];
+
+  state.viewings=[
+    {id:uid(),propertyId:p1,
+     agencyCompany:'德佑地产',agentName:'赵经理',agentPhone:'139-0000-1111',
+     clientName:'李先生',clientId:c1,clientPhone:'139-1234-5678',clientProfile:'企业高管，投资型客户，预算3000万左右，资金实力强',
+     viewingTime:today(14,0),duration:90,rating:5,
+     likes:['花园','客厅','朝向'],dislikes:['价格偏高'],
+     feedback:'对花园和客厅非常满意，觉得价格偏高，需要考虑。意向度较高。',
+     followUp:'继续跟进，准备议价方案',notes:'VIP客户，二次复看，决策较快',
+     attachments:[],createTime:now.toISOString()},
+    {id:uid(),propertyId:p1,
+     agencyCompany:'链家',agentName:'孙经理',agentPhone:'138-2222-3333',
+     clientName:'陈先生',clientId:c3,clientPhone:'137-1111-2222',clientProfile:'私企业主，改善型需求，预算4000万，对花园有执念',
+     viewingTime:dayOffset(-2,11,0),duration:60,rating:4,
+     likes:['花园','面积'],dislikes:['价格偏高','车位少'],
+     feedback:'花园很满意，价格和车位是顾虑。',
+     followUp:'推荐同区域低总价房源',notes:'',
+     attachments:[],createTime:now.toISOString()},
+    {id:uid(),propertyId:p2,
+     agencyCompany:'中原地产',agentName:'周经理',agentPhone:'137-4444-5555',
+     clientName:'王女士',clientId:c2,clientPhone:'138-5678-9012',clientProfile:'金融从业，全款自住客户，预算5000万，看重品质和学区',
+     viewingTime:today(10,0),duration:75,rating:5,
+     likes:['景观','客厅','朝向'],dislikes:[],
+     feedback:'湖景印象深刻，物业配套满意，有意向下议价。',
+     followUp:'准备议价方案，3天内回复',notes:'全款客户，优先级高',
+     attachments:[],createTime:now.toISOString()},
+    {id:uid(),propertyId:p2,
+     agencyCompany:'我爱我家',agentName:'吴经理',agentPhone:'136-6666-7777',
+     clientName:'张总',clientId:c4,clientPhone:'136-3333-4444',clientProfile:'投资人，预算8000万，资金灵活，看中升值潜力',
+     viewingTime:dayOffset(-3,14,0),duration:90,rating:5,
+     likes:['景观','品质'],dislikes:['厨房偏小'],
+     feedback:'整体满意，厨房偏小是唯一顾虑。',
+     followUp:'推荐复式户型',notes:'',
+     attachments:[],createTime:now.toISOString()},
+    {id:uid(),propertyId:p3,
+     agencyCompany:'太平洋房屋',agentName:'刘经理',agentPhone:'135-8888-9999',
+     clientName:'刘女士',clientId:c5,clientPhone:'135-5555-6666',clientProfile:'教师家庭，刚需自住，预算2500万，预算有限',
+     viewingTime:dayOffset(-1,15,0),duration:60,rating:4,
+     likes:['户型','价格'],dislikes:['朝向'],
+     feedback:'户型和价格满意，朝向一般。',
+     followUp:'推荐同小区其他朝向',notes:'',
+     attachments:[],createTime:now.toISOString()}
+  ];
+
+  state.todos=[
+    {id:uid(),type:'带看',title:'李先生复看西郊庄园',startTime:'09:00',endTime:'10:30',time:'09:00',
+     propertyId:p1,clientId:c1,
+     clientStatus:'VIP客户，资金实力强，已二次复看',
+     feedback:'客户对花园和客厅非常满意，对价格有些顾虑，需要准备议价方案',
+     done:false,createTime:now.toISOString()},
+    {id:uid(),type:'回访',title:'回访王女士（湖畔佳苑意向客户）',startTime:'11:00',endTime:'11:30',time:'11:00',
+     propertyId:p2,clientId:c2,
+     clientStatus:'A级客户，全款自住，看重品质',
+     feedback:'昨天看房后表示湖景印象很深，今天确认是否需要议价',
+     done:false,createTime:now.toISOString()},
+    {id:uid(),type:'带看',title:'张总复看仁恒西郊花园',startTime:'13:30',endTime:'14:30',time:'13:30',
+     propertyId:p3,clientId:c4,
+     clientStatus:'B级客户，投资型，注重花园和升值空间',
+     feedback:'上次看房对花园非常满意，今天带夫人一同复看',
+     done:false,createTime:now.toISOString()},
+    {id:uid(),type:'联系房东',title:'联系西庭网球俱乐部房东',startTime:'15:00',endTime:'15:30',time:'15:00',
+     propertyId:p4,
+     clientStatus:'俱乐部资产，稀缺资源',
+     feedback:'讨论议价空间，准备下周带重要客户看房',
+     done:false,createTime:now.toISOString()},
+    {id:uid(),type:'上传',title:'上传湖畔佳苑夜景照片',startTime:'16:00',endTime:'16:30',time:'16:00',
+     propertyId:p2,
+     clientStatus:'-',
+     feedback:'补充夜景素材，提升房源吸引力',
+     done:false,createTime:now.toISOString()},
+    {id:uid(),type:'生成周报',title:'生成西郊庄园房东周报',startTime:'17:00',endTime:'17:30',time:'17:00',
+     propertyId:p1,
+     clientStatus:'-',
+     feedback:'本周带看2组，预约6组，需要准备周报',
+     done:false,createTime:now.toISOString()},
+    {id:uid(),type:'跟进',title:'跟进今天所有客户反馈',startTime:'20:00',endTime:'21:00',time:'20:00',
+     propertyId:null,
+     clientStatus:'-',
+     feedback:'整理今日客户反馈，更新客户跟进记录',
+     done:false,createTime:now.toISOString()},
+    // 明日待办
+    {id:uid(),type:'带看',title:'德佑赵经理带客户看西郊庄园',startTime:'10:00',endTime:'11:30',time:'10:00',
+     propertyId:p1,tomorrow:true,
+     clientStatus:'德佑地产赵经理带来的投资客户，预算3000万',
+     feedback:'',
+     done:false,createTime:now.toISOString()},
+    {id:uid(),type:'带看',title:'中原周经理带客户看湖畔佳苑',startTime:'14:00',endTime:'15:00',time:'14:00',
+     propertyId:p2,tomorrow:true,
+     clientStatus:'中原地产周经理带来的全款自住客户',
+     feedback:'',
+     done:false,createTime:now.toISOString()},
+    {id:uid(),type:'联系房东',title:'联系仁恒西郊花园房东议价',startTime:'16:00',endTime:'16:30',time:'16:00',
+     propertyId:p3,tomorrow:true,
+     clientStatus:'-',
+     feedback:'客户反馈价格偏高，与房东沟通议价空间',
+     done:false,createTime:now.toISOString()}
+  ];
+
+  state.followUps=[
+    {id:uid(),clientId:c1,type:'电话',content:'首次电话沟通，了解投资需求',time:dayOffset(-5,10,0),createTime:now.toISOString()},
+    {id:uid(),clientId:c1,type:'带看',content:'带看西郊庄园18号，客户满意',time:dayOffset(-3,14,0),createTime:now.toISOString()},
+    {id:uid(),clientId:c1,type:'微信',content:'微信发送房源详情，客户回复感兴趣',time:dayOffset(-1,16,0),createTime:now.toISOString()},
+    {id:uid(),clientId:c2,type:'电话',content:'电话沟通自住需求，确认学区',time:dayOffset(-4,11,0),createTime:now.toISOString()},
+    {id:uid(),clientId:c2,type:'带看',content:'带看汤臣一品，客户有意议价',time:dayOffset(-2,10,0),createTime:now.toISOString()},
+    {id:uid(),clientId:c3,type:'见面',content:'面谈了解改善需求',time:dayOffset(-6,15,0),createTime:now.toISOString()},
+    {id:uid(),clientId:c4,type:'带看',content:'两次带看汤臣一品',time:dayOffset(-5,10,0),createTime:now.toISOString()},
+    {id:uid(),clientId:c4,type:'报价',content:'提供报价方案，等待回复',time:dayOffset(-1,14,0),createTime:now.toISOString()}
+  ];
+
+  state.currentPropertyId=p1;
+  saveState();
+}
+
+// ===== Header时钟 =====
+function updateClock(){
+  const now=new Date();
+  document.getElementById('headerTime').textContent=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('headerDate').textContent=formatDate(now);
+  const h=now.getHours();let g='晚上好';
+  if(h<6)g='凌晨好';else if(h<12)g='上午好';else if(h<14)g='中午好';else if(h<18)g='下午好';
+  document.getElementById('welcomeName').textContent=`${g}，${state.agent.name}`;
+  const todayViewings=state.viewings.filter(v=>isToday(v.viewingTime));
+  const undone=state.todos.filter(t=>!t.done&&isToday(t.createTime));
+  document.getElementById('welcomeSub').textContent=todayViewings.length>0?`今日${todayViewings.length}场带看 · ${undone.length}项待办`:'今日暂无带看安排';
+}
+
+// ===== 房源切换 =====
+function togglePropertyDropdown(){
+  const dd=document.getElementById('propertyDropdown'),sw=document.getElementById('propertySwitch');
+  dd.classList.toggle('open');sw.classList.toggle('open');
+  if(dd.classList.contains('open'))renderPropertyDropdown();
+}
+function renderPropertyDropdown(){
+  document.getElementById('propertyDropdown').innerHTML=state.properties.map(p=>`
+    <div class="pd-item ${p.id===state.currentPropertyId?'active':''}" onclick="switchProperty('${p.id}')">
+      <div><div class="pd-name">${p.name}</div><div class="pd-info">${p.layout} · ${p.area}㎡ · ${formatPrice(p.price)}</div></div>
+      <span class="pd-check ${p.id===state.currentPropertyId?'':'hidden'}">✓</span>
+    </div>`).join('')+`<div class="pd-item" onclick="togglePropertyDropdown();switchTab('properties');setTimeout(()=>openPropertyForm(),300)"><div><div class="pd-name" style="color:var(--gold)">+ 添加新房源</div></div></div>`;
+}
+function switchProperty(id){
+  state.currentPropertyId=id;saveState();updateCurrentPropertyDisplay();
+  document.getElementById('propertyDropdown').classList.remove('open');
+  document.getElementById('propertySwitch').classList.remove('open');
+  toast('已切换到 '+getPropName(id));
+}
+function updateCurrentPropertyDisplay(){
+  const p=getProp(state.currentPropertyId);
+  document.getElementById('currentPropertyName').textContent=p?p.name:'无房源';
+}
+document.addEventListener('click',e=>{if(!e.target.closest('#propertySwitch')&&!e.target.closest('#propertyDropdown')){document.getElementById('propertyDropdown').classList.remove('open');document.getElementById('propertySwitch').classList.remove('open')}});
+
+// ===== Tab切换 =====
+function switchTab(tab){
+  state.currentTab=tab;
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  const map={'workbench':'page-workbench','properties':'page-properties','clients':'page-clients','profile':'page-profile'};
+  document.getElementById(map[tab]).classList.add('active');
+  const ti={'workbench':0,'properties':1,'clients':2,'profile':3};
+  document.querySelectorAll('.tab-item')[ti[tab]].classList.add('active');
+  if(tab==='workbench')renderWorkbench();
+  else if(tab==='properties')renderProperties();
+  else if(tab==='clients')renderClients();
+  else if(tab==='profile')renderProfile();
+  window.scrollTo(0,0);
+}
+
+// ===== 工作台 =====
+function renderTodoList(todos,containerId,emptyText){
+  document.getElementById(containerId).innerHTML=todos.length===0?
+    `<div class="empty"><div class="icon">○</div><p>${emptyText}</p></div>`:
+    todos.sort((a,b)=>(a.time||'').localeCompare(b.time||'')).map(t=>{
+      const timeText=t.startTime?t.startTime+(t.endTime?'-'+t.endTime.split(':').slice(0,2).join(':'):''):(t.time||'--');
+      const endTime=t.endTime?t.endTime.split(':').slice(0,2).join(':'):'';
+      return `<div class="todo-item ${t.done?'done':''}" onclick="openTodoForm('${t.id}')">
+        <div class="todo-check" onclick="event.stopPropagation();toggleTodo('${t.id}')">${t.done?'✓':''}</div>
+        <div class="todo-time">${timeText.split('-')[0]}${t.endTime?`<span class="end-time">${endTime}</span>`:''}</div>
+        <div class="todo-content">
+          <div class="todo-title">${t.title}</div>
+          <div><span class="todo-type">${t.type}</span>${t.propertyId?`<span class="todo-prop">· ${getPropName(t.propertyId)}</span>`:''}</div>
+          ${t.clientStatus&&t.clientStatus!=='-'?`<div class="todo-client"><span class="lbl">客户情况</span>${t.clientStatus}</div>`:''}
+          ${t.feedback?`<div class="todo-client"><span class="lbl">反馈</span>${t.feedback}</div>`:''}
+        </div>
+        <div class="todo-arrow">›</div>
+      </div>`;
+    }).join('');
+}
+
+function renderWorkbench(){
+  const todayTodos=state.todos.filter(t=>!t.tomorrow);
+  const tomorrowTodos=state.todos.filter(t=>t.tomorrow);
+  const doneCount=todayTodos.filter(t=>t.done).length;
+  document.getElementById('todoCount').textContent=`${doneCount}/${todayTodos.length}`;
+  renderTodoList(todayTodos,'todoList','今日无待办');
+  document.getElementById('tomorrowTodoCount').textContent=tomorrowTodos.length+'项';
+  renderTodoList(tomorrowTodos,'tomorrowTodoList','明日无待办，可提前安排');
+
+  const focusProps=state.properties.slice(0,5);
+  document.getElementById('focusPropCount').textContent=focusProps.length+'套';
+  document.getElementById('focusProperties').innerHTML=focusProps.map(p=>{
+    const propViewings=state.viewings.filter(v=>v.propertyId===p.id);
+    const todayV=propViewings.filter(v=>isToday(v.viewingTime)).length;
+    const weekV=propViewings.filter(v=>isThisWeek(v.viewingTime)).length;
+    const todayFeedback=propViewings.filter(v=>isToday(v.viewingTime)&&v.feedback).length;
+    const needContact=(p.stats?.views||0)>100&&weekV<3;
+    return `<div class="work-card" onclick="viewPropertyDetail('${p.id}')">
+      <div class="wc-image">${(()=>{const ci=p.coverIndex||0;const img=(p.images&&p.images.length>0)?p.images[Math.min(ci,p.images.length-1)]:null;return img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover">`:`${p.type==='别墅'?'◆':p.type==='复式'?'◇':'▦'}`})()}</div>
+      <div class="wc-body">
+        <div class="wc-header"><div class="wc-name">${p.name}</div><div class="wc-price">${formatPriceHTML(p.price)}</div></div>
+        <div class="wc-meta">${p.area}㎡ · ${p.layout} · ${p.exclusive?'<span style="color:var(--gold)">独家代理</span>':p.status}</div>
+        <div class="wc-stats" style="grid-template-columns:repeat(3,1fr)">
+          <div class="wc-stat"><div class="num">${todayV}</div><div class="label">今日带看</div></div>
+          <div class="wc-stat"><div class="num">${todayFeedback}</div><div class="label">今日反馈</div></div>
+          <div class="wc-stat"><div class="num">${weekV}</div><div class="label">本周带看</div></div>
+        </div>
+        ${needContact?`<div class="wc-alert">⚠ 今日需要联系房东</div>`:''}
+        <div class="wc-actions" onclick="event.stopPropagation()">
+          <button class="wc-action-btn" onclick="shareProperty('${p.id}')">📤 分享</button>
+          <button class="wc-action-btn" onclick="editProperty('${p.id}')">✏️ 编辑</button>
+          <button class="wc-action-btn danger" onclick="deleteProperty('${p.id}')">🗑 删除</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const focusClients=state.clients.filter(c=>c.level==='A'||c.level==='B').slice(0,5);
+  document.getElementById('focusClientCount').textContent=focusClients.length+'位';
+  document.getElementById('focusClients').innerHTML=focusClients.length===0?
+    `<div class="empty"><div class="icon">○</div><p>暂无重点客户</p></div>`:
+    focusClients.map(c=>{
+      const status=c.nextAction?`${c.nextAction.type}：${c.nextAction.note}`:'暂无安排';
+      return `<div class="focus-client" onclick="switchTab('clients');setTimeout(()=>viewClientDetail('${c.id}'),100)">
+        <div class="fc-avatar">${c.name[0]}</div>
+        <div class="fc-info"><div class="fc-name">${c.name} · ${c.budget}万</div><div class="fc-status">${status}</div></div>
+        <div class="fc-badge"><span class="badge level-${c.level}">${c.level}</span></div>
+        <div class="fc-actions" onclick="event.stopPropagation()">
+          <button class="fc-action-btn" onclick="event.stopPropagation();editClient('${c.id}')">✏️</button>
+          <button class="fc-action-btn danger" onclick="event.stopPropagation();deleteClient('${c.id}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+
+  document.getElementById('quickActions').innerHTML=`
+    <div class="quick-action" onclick="openViewingForm()"><div class="qa-icon">🚶</div><div class="qa-label">开始带看</div></div>
+    <div class="quick-action" onclick="openPropertyForm()"><div class="qa-icon">🏠</div><div class="qa-label">新增房源</div></div>
+    <div class="quick-action" onclick="openClientForm()"><div class="qa-icon">👤</div><div class="qa-label">新增客户</div></div>
+    <div class="quick-action" onclick="openTodoForm()"><div class="qa-icon">📝</div><div class="qa-label">新增待办</div></div>
+    <div class="quick-action" onclick="showReportForCurrent()"><div class="qa-icon">📊</div><div class="qa-label">生成周报</div></div>
+    <div class="quick-action" onclick="toast('朋友圈文案已生成')"><div class="qa-icon">📢</div><div class="qa-label">朋友圈</div></div>
+  `;
+}
+
+// ===== 待办 =====
+function openTodoForm(id,isTomorrow){
+  const isEdit=!!id;
+  const t=isEdit?state.todos.find(x=>x.id===id):null;
+  const isTom = isEdit?(t?.tomorrow||false):(isTomorrow||false);
+  document.getElementById('todoFormTitle').textContent=isEdit?'编辑待办':(isTom?'新增明日待办':'新增今日待办');
+  document.getElementById('tf_id').value=isEdit?t.id:'';
+  document.getElementById('tf_tomorrow').value=isTom?'true':'false';
+  document.getElementById('tf_startTime').value=t?.startTime||(t?.time||'09:00');
+  document.getElementById('tf_endTime').value=t?.endTime||'';
+  document.getElementById('tf_type').value=t?.type||'带看';
+  document.getElementById('tf_title').value=t?.title||'';
+  document.getElementById('tf_clientStatus').value=t?.clientStatus||'';
+  document.getElementById('tf_feedback').value=t?.feedback||'';
+  document.getElementById('tf_deleteBtn').style.display=isEdit?'flex':'';
+  // 房源下拉
+  const propSel=document.getElementById('tf_propertyId');
+  propSel.innerHTML='<option value="">无</option>'+state.properties.map(p=>`<option value="${p.id}" ${t?.propertyId===p.id?'selected':''}>${p.name}</option>`).join('');
+  // 客户下拉
+  const cliSel=document.getElementById('tf_clientId');
+  cliSel.innerHTML='<option value="">无</option>'+state.clients.map(c=>`<option value="${c.id}" ${t?.clientId===c.id?'selected':''}>${c.name}</option>`).join('');
+  document.getElementById('todoFormOverlay').classList.add('active');
+}
+function saveTodo(){
+  const title=document.getElementById('tf_title').value.trim();
+  if(!title){toast('请填写标题');return}
+  const id=document.getElementById('tf_id').value;
+  const startTime=document.getElementById('tf_startTime').value;
+  const endTime=document.getElementById('tf_endTime').value;
+  const data={
+    type:document.getElementById('tf_type').value,
+    title,
+    startTime,endTime,time:startTime,
+    tomorrow:document.getElementById('tf_tomorrow').value==='true',
+    propertyId:document.getElementById('tf_propertyId').value||null,
+    clientId:document.getElementById('tf_clientId').value||null,
+    clientStatus:document.getElementById('tf_clientStatus').value.trim(),
+    feedback:document.getElementById('tf_feedback').value.trim()
+  };
+  if(id){
+    const idx=state.todos.findIndex(t=>t.id===id);
+    state.todos[idx]={...state.todos[idx],...data};
+    toast('待办已更新');
+  }else{
+    state.todos.push({id:uid(),...data,done:false,createTime:new Date().toISOString()});
+    toast('待办已添加');
+  }
+  saveState();closeForm('todoFormOverlay');renderWorkbench();
+}
+function deleteTodoFromForm(){
+  const id=document.getElementById('tf_id').value;
+  if(!id)return;
+  if(!confirm('确定删除此待办？'))return;
+  state.todos=state.todos.filter(t=>t.id!==id);
+  saveState();closeForm('todoFormOverlay');renderWorkbench();toast('已删除');
+}
+function toggleTodo(id){
+  const t=state.todos.find(t=>t.id===id);if(t){t.done=!t.done;saveState();renderWorkbench();}
+}
+function deleteTodo(id){state.todos=state.todos.filter(t=>t.id!==id);saveState();renderWorkbench();}
+
+// ===== 房源列表 =====
+function filterProperties(v){state.propSearch=v;renderProperties()}
+function filterPropBy(f,el){state.propertyFilter=f;document.querySelectorAll('#propFilterTabs .filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderProperties()}
+function renderProperties(){
+  let list=state.properties;
+  if(state.propertyFilter==='exclusive')list=list.filter(p=>p.exclusive);
+  else if(state.propertyFilter!=='all')list=list.filter(p=>p.status===state.propertyFilter);
+  if(state.propSearch)list=list.filter(p=>p.name.includes(state.propSearch)||p.address.includes(state.propSearch));
+  const c=document.getElementById('propertyList');
+  if(list.length===0){c.innerHTML=`<div class="empty"><div class="icon">○</div><p>暂无房源</p></div>`;return}
+  c.innerHTML=list.map(p=>{
+    const vc=state.viewings.filter(v=>v.propertyId===p.id).length;
+    const coverIdx=p.coverIndex||0;
+    const coverImg=(p.images&&p.images.length>0)?p.images[Math.min(coverIdx,p.images.length-1)]:null;
+    return `<div class="property-card" onclick="viewPropertyDetail('${p.id}')">
+      <div class="pc-image">${coverImg?`<img src="${coverImg}" style="width:100%;height:100%;object-fit:cover">`:`${p.type==='别墅'?'◆':p.type==='复式'?'◇':'▦'}`}</div>
+      <div class="pc-body">
+        <div class="pc-row"><div class="pc-name">${p.name}</div><div class="pc-price">${formatPriceHTML(p.price)}</div></div>
+        <div class="pc-meta"><span>· ${p.area}㎡</span><span>· ${p.layout}</span><span>· ${p.floor}</span><span class="status-${p.status}">●${p.status}</span></div>
+        <div class="pc-tags">${p.exclusive?'<span class="tag">独家代理</span>':''}${p.tags.filter(t=>t!=='独家代理').map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="pc-stats"><span>带看 ${vc}组</span><span>收藏 ${p.stats?.favorites||0}</span></div>
+        ${p.surroundings?`<div class="pc-surroundings"><span class="pc-surr-label">周边</span>${p.surroundings.schools&&p.surroundings.schools.length?'<span class="pc-surr-tag">国际学校</span>':''}${p.surroundings.medical&&p.surroundings.medical.length?'<span class="pc-surr-tag">医疗</span>':''}${p.surroundings.transport&&p.surroundings.transport.length?'<span class="pc-surr-tag">交通</span>':''}${p.surroundings.commercial&&p.surroundings.commercial.length?'<span class="pc-surr-tag">商业</span>':''}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== 房源工作台(8模块) =====
+function viewPropertyDetail(id){
+  const p=getProp(id);if(!p)return;
+  state.currentPropertyId=id;saveState();updateCurrentPropertyDisplay();
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-property-detail').classList.add('active');
+  document.getElementById('detailHero').innerHTML=(p.images&&p.images.length>0)?`<img src="${p.images[Math.min(p.coverIndex||0,p.images.length-1)]}" style="width:100%;height:100%;object-fit:cover">`:`${p.type==='别墅'?'◆':p.type==='复式'?'◇':'▦'}`;
+
+  const propViewings=state.viewings.filter(v=>v.propertyId===id);
+  const todayV=propViewings.filter(v=>isToday(v.viewingTime));
+  const weekV=propViewings.filter(v=>isThisWeek(v.viewingTime));
+
+  document.getElementById('propertyDetailInfo').innerHTML=`
+    <h1>${p.name}</h1>
+    <div style="font-size:12px;color:var(--text-dim)">· ${p.address||'地址未填'}</div>
+    <div class="d-price">${formatPriceHTML(p.price)}</div>
+    <div style="margin-bottom:10px">${p.exclusive?'<span class="tag" style="background:rgba(201,169,97,.25);color:var(--gold-light)">独家代理</span>':''}<span class="tag status-${p.status}">●${p.status}</span>${p.tags.filter(t=>t!=='独家代理').map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+
+    <!-- 模块1: 房源信息 -->
+    <div class="card">
+      <div class="card-title">房源信息</div>
+      <div class="info-grid">
+        <div class="ig-item"><div class="ig-label">户型</div><div class="ig-value">${p.layout}</div></div>
+        <div class="ig-item"><div class="ig-label">面积</div><div class="ig-value">${p.area}㎡</div></div>
+        <div class="ig-item"><div class="ig-label">楼层</div><div class="ig-value">${p.floor}</div></div>
+        <div class="ig-item"><div class="ig-label">类型</div><div class="ig-value">${p.type}</div></div>
+        <div class="ig-item"><div class="ig-label">车位</div><div class="ig-value">${p.parking||'-'}</div></div>
+        <div class="ig-item"><div class="ig-label">配套</div><div class="ig-value">${(p.facilities||[]).join('、')||'-'}</div></div>
+        <div class="ig-item"><div class="ig-label">物业费</div><div class="ig-value">${p.fee?p.fee+'元/㎡/月':'-'}</div></div>
+        <div class="ig-item"><div class="ig-label">装修</div><div class="ig-value">${p.decoration||'-'}</div></div>
+        <div class="ig-item"><div class="ig-label">朝向</div><div class="ig-value">${p.orientation||'-'}</div></div>
+      </div>
+      ${p.highlights&&p.highlights.length?`<div style="margin-top:10px"><div style="font-size:12px;color:var(--text-dim);margin-bottom:6px">卖点</div>${p.highlights.map(h=>`<span class="tag tag-green">${h}</span>`).join('')}</div>`:''}
+      ${p.description?`<div style="margin-top:10px;font-size:13px;color:var(--text-mid);line-height:1.6">${p.description}</div>`:''}
+      ${p.ownerMindset?`<div style="margin-top:12px;padding:10px;background:rgba(201,169,97,.06);border:1px solid rgba(201,169,97,.15);border-radius:8px"><div style="font-size:12px;color:var(--gold);margin-bottom:4px">房东心态</div><div style="font-size:13px;color:var(--text-mid);line-height:1.5">${p.ownerMindset}</div></div>`:''}
+      <!-- 周边配套（可增改删） -->
+      <div style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:13px;color:var(--gold-light);font-weight:600">周边配套</div>
+          <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:11px" onclick="openSurroundingForm('${p.id}')">+ 新增</button>
+        </div>
+        ${['schools','medical','transport','commercial','life'].map(cat=>{
+          const labels={schools:'🏫 国际学校',medical:'🏥 医疗',transport:'🚇 交通',commercial:'🛍 商业',life:'🌳 生活'};
+          const items=p.surroundings?.[cat]||[];
+          if(!items.length)return'';
+          return `<div style="margin-bottom:12px">
+            <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">${labels[cat]}</div>
+            ${items.map((s,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+              <div style="font-size:13px;color:var(--text-mid);flex:1">· ${typeof s==='string'?s:s.name}</div>
+              <div style="display:flex;gap:4px;flex-shrink:0">
+                <button class="btn btn-sm" style="padding:2px 6px;font-size:10px;background:var(--bg-card2);color:var(--text-dim)" onclick="event.stopPropagation();openSurroundingForm('${p.id}','${cat}',${i})">编辑</button>
+                <button class="btn btn-sm" style="padding:2px 6px;font-size:10px;background:rgba(229,57,53,.1);color:var(--red)" onclick="event.stopPropagation();deleteSurrounding('${p.id}','${cat}',${i})">删除</button>
+              </div>
+            </div>`).join('')}
+          </div>`;
+        }).join('')}
+      </div>
+      <!-- 地图导航 -->
+      <div style="margin-top:14px">
+        <div style="font-size:13px;color:var(--gold-light);font-weight:600;margin-bottom:10px">📍 位置导航</div>
+        <div style="position:relative;height:120px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:10px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);overflow:hidden">
+          <div style="text-align:center;color:var(--text-dim)"><div style="font-size:32px;margin-bottom:4px">🗺</div><div style="font-size:12px">${p.address||'地址未填'}</div></div>
+        </div>
+        <button class="btn btn-outline btn-sm btn-full" style="margin-top:10px" onclick="openMapNav('${encodeURIComponent(p.address||p.name)}')">点击导航</button>
+      </div>
+      <!-- 经纪人联系卡 -->
+      <div style="margin-top:14px;padding:14px;background:linear-gradient(135deg,rgba(201,169,97,.08),rgba(201,169,97,.02));border:1px solid rgba(201,169,97,.2);border-radius:12px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="width:48px;height:48px;border-radius:50%;background:var(--gold);color:#0a0a0a;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;flex-shrink:0">${state.agent.avatar||state.agent.name[0]||'Y'}</div>
+          <div style="flex:1">
+            <div style="font-size:15px;color:var(--text);font-weight:600">${state.agent.name||'YUKI'}</div>
+            <div style="font-size:12px;color:var(--text-dim);margin-top:2px">${state.agent.title||'豪宅独家代理经纪人'}</div>
+            ${state.agent.phone?`<div style="font-size:12px;color:var(--gold);margin-top:4px">📞 ${state.agent.phone}</div>`:''}
+          </div>
+          <a href="tel:${state.agent.phone||''}" style="background:var(--gold);color:#0a0a0a;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:600;text-decoration:none;flex-shrink:0">📞 联系</a>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-outline btn-sm" style="flex:1" onclick="editProperty('${p.id}')">编辑</button>
+        <button class="btn btn-outline btn-sm" style="flex:1" onclick="shareProperty('${p.id}')">分享</button>
+        <button class="btn btn-primary btn-sm" style="flex:1" onclick="openViewingForm('${p.id}')">+ 带看</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProperty('${p.id}')">删除</button>
+      </div>
+    </div>
+
+    <!-- 模块1.5: 房源跟进情况 -->
+    <div class="card">
+      <div class="card-title">房源跟进情况 <span class="more"><button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:11px" onclick="openPropFollowUpForm('${p.id}')">+ 新增</button></span></div>
+      ${(p.followUps&&p.followUps.length)?p.followUps.sort((a,b)=>new Date(b.time)-new Date(a.time)).map(f=>{
+        const typeColors={'电话':'#42a5f5','微信':'#66bb6a','见面':'#ff9800','带看反馈':'#c9a961','报价沟通':'#ef5350','签约进展':'#c9a961'};
+        const tc=typeColors[f.type]||'#888';
+        return `<div style="padding:10px 0;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="padding:2px 6px;border-radius:4px;font-size:11px;background:rgba(${tc==='#42a5f5'?'66,165,245':tc==='#66bb6a'?'102,187,106':tc==='#ff9800'?'255,152,0':tc==='#c9a961'?'201,169,97':'239,57,53'},.15);color:${tc}">${f.type}</span>
+              ${f.target?`<span style="font-size:11px;color:var(--text-dim)">→ ${f.target}</span>`:''}
+            </div>
+            <div style="display:flex;gap:4px">
+              <button class="btn btn-sm" style="padding:2px 6px;font-size:10px;background:var(--bg-card2);color:var(--text-dim)" onclick="event.stopPropagation();openPropFollowUpForm('${p.id}','${f.id}')">编辑</button>
+              <button class="btn btn-sm" style="padding:2px 6px;font-size:10px;background:rgba(229,57,53,.1);color:var(--red)" onclick="event.stopPropagation();deletePropFollowUp('${p.id}','${f.id}')">删除</button>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--text-mid);line-height:1.5">${f.content}</div>
+          ${f.time?`<div style="font-size:11px;color:var(--text-dim);margin-top:4px">${formatDate(f.time)} ${formatTimeShort(f.time)}</div>`:''}
+        </div>`;
+      }).join(''):'<div class="empty"><div class="icon">◆</div><p>暂无跟进记录，点击新增</p></div>'}
+    </div>
+
+    <!-- 模块2: 今日带看/今日预约 -->
+    <div class="card">
+      <div class="card-title">今日数据</div>
+      <div class="today-stats">
+        <div class="today-stat-item" onclick="scrollToViewingSection()">
+          <div class="ts-num">${todayV.length}</div>
+          <div class="ts-label">今日带看</div>
+          <div class="ts-sub">${todayV.filter(v=>v.feedback).length}条反馈</div>
+        </div>
+        <div class="today-stat-item" onclick="showTodayBookings('${p.id}')">
+          <div class="ts-num">${p.stats?.bookings||0}</div>
+          <div class="ts-label">今日预约</div>
+          <div class="ts-sub">本周${weekV.length}场带看</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模块3: 今日带看 -->
+    <div class="card">
+      <div class="card-title">今日带看 <span class="more">${todayV.length}场</span></div>
+      ${todayV.length===0?`<div class="empty"><div class="icon">○</div><p>今日暂无带看</p></div>`:
+        todayV.map(v=>renderViewingBlock(v)).join('')}
+    </div>
+
+    <!-- 模块4: 带看记录 -->
+    <div class="card">
+      <div class="card-title">带看记录 <span class="more">${propViewings.length}场</span></div>
+      ${propViewings.length===0?`<div class="empty"><div class="icon">○</div><p>暂无带看记录</p></div>`:
+        propViewings.sort((a,b)=>new Date(b.viewingTime)-new Date(a.viewingTime)).map(v=>renderViewingBlock(v)).join('')}
+    </div>
+
+    <!-- 模块5: 本周数据 -->
+    <div class="card">
+      <div class="card-title">本周数据</div>
+      <div style="display:flex;gap:12px">
+        <div style="flex:1;background:var(--bg-card2);border-radius:12px;padding:16px;text-align:center;border:1px solid rgba(201,169,97,.15)">
+          <div style="font-size:32px;font-weight:700;color:var(--gold);font-family:Georgia,serif">${weekV.length}</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-top:4px">本周带看量</div>
+        </div>
+        <div style="flex:1;background:var(--bg-card2);border-radius:12px;padding:16px;text-align:center;border:1px solid rgba(102,187,106,.15)">
+          <div style="font-size:32px;font-weight:700;color:var(--green);font-family:Georgia,serif">${weekV.filter(v=>(v.rating||0)>=4).length}</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-top:4px">本周意向</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模块6: 客户反馈分析(AI) -->
+    <div class="card">
+      <div class="card-title">客户反馈分析</div>
+      <div class="ai-section">
+        <div class="ai-badge">◆ AI自动汇总</div>
+        ${renderFeedbackAnalysis(id)}
+      </div>
+    </div>
+
+    <!-- 模块7: 房东建议 -->
+    <div class="card">
+      <div class="card-title">房东建议 <span class="more"><button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:11px" onclick="generateSuggestions('${p.id}')">AI生成</button> <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:11px" onclick="openSuggestionForm('${p.id}')">+ 新增</button></span></div>
+      ${(p.suggestions||[]).length===0?`<div class="empty"><div class="icon">◆</div><p>暂无建议，点击"AI生成"自动创建</p></div>`:
+        (p.suggestions||[]).map(s=>`
+        <div class="suggestion-item">
+          <div class="suggestion-header">
+            <span class="suggestion-type">${s.type}</span>
+            <div class="suggestion-actions">
+              <button class="btn btn-sm" style="padding:2px 6px;font-size:10px;background:var(--bg-card2);color:var(--text-dim)" onclick="event.stopPropagation();openSuggestionForm('${p.id}','${s.id}')">编辑</button>
+              <button class="btn btn-sm" style="padding:2px 6px;font-size:10px;background:rgba(229,57,53,.1);color:var(--red)" onclick="event.stopPropagation();deleteSuggestion('${p.id}','${s.id}')">删除</button>
+            </div>
+          </div>
+          <div class="suggestion-text">${s.text}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+
+    <!-- 模块8: 房东周报 -->
+    <div class="card">
+      <div class="card-title">房东周报</div>
+      <div style="font-size:13px;color:var(--text-dim);margin-bottom:10px">系统自动汇总本周数据，生成房东周报</div>
+      <button class="btn btn-primary btn-full btn-sm" onclick="showReport('${p.id}')">生成周报</button>
+    </div>
+  `;
+}
+
+function renderViewingBlock(v){
+  const stars='★'.repeat(v.rating||4)+'☆'.repeat(5-(v.rating||4));
+  return `<div class="viewing-block" style="cursor:pointer" onclick="event.stopPropagation();openViewingForm(null,null,'${v.id}')">
+    <div class="vb-header">
+      <div><span class="vb-time">${formatTimeShort(v.viewingTime)}</span> <span class="vb-client">${v.clientName}</span> <span style="font-size:12px;color:var(--text-dim)">· ${v.duration}分钟</span></div>
+      <div class="stars">${stars}</div>
+    </div>
+    ${v.agencyCompany||v.agentName?`<div class="vb-row"><div class="vb-label">代看</div><div class="vb-content">${v.agencyCompany||''} ${v.agentName||''} ${v.agentPhone?v.agentPhone:''}</div></div>`:''}
+    ${v.clientProfile?`<div class="vb-row"><div class="vb-label">客户情况</div><div class="vb-content">${v.clientProfile}</div></div>`:''}
+    ${v.likes&&v.likes.length?`<div class="vb-row"><div class="vb-label">喜欢</div><div class="vb-content" style="color:var(--green)">${v.likes.join('、')}</div></div>`:''}
+    ${v.dislikes&&v.dislikes.length?`<div class="vb-row"><div class="vb-label">不足</div><div class="vb-content" style="color:var(--red)">${v.dislikes.join('、')}</div></div>`:''}
+    ${v.feedback?`<div class="vb-row"><div class="vb-label">现场反馈</div><div class="vb-content">${v.feedback}</div></div>`:''}
+    ${v.followUp?`<div class="vb-row"><div class="vb-label">下一步</div><div class="vb-content">${v.followUp}</div></div>`:''}
+    ${v.notes?`<div class="vb-row"><div class="vb-label">备注</div><div class="vb-content" style="color:var(--text-dim)">${v.notes}</div></div>`:''}
+  </div>`;
+}
+
+// ===== AI功能 =====
+function renderFeedbackAnalysis(propId){
+  const viewings=state.viewings.filter(v=>v.propertyId===propId&&v.feedback);
+  if(viewings.length===0)return`<div style="font-size:13px;color:var(--text-dim)">暂无带看反馈数据</div>`;
+  const likesCount={},dislikesCount={};
+  viewings.forEach(v=>{(v.likes||[]).forEach(k=>likesCount[k]=(likesCount[k]||0)+1);(v.dislikes||[]).forEach(k=>dislikesCount[k]=(dislikesCount[k]||0)+1)});
+  const topLikes=Object.entries(likesCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const topDislikes=Object.entries(dislikesCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  let html='';
+  if(topLikes.length){html+=`<div style="font-size:12px;color:var(--text-dim);margin-bottom:6px">客户最喜欢</div>`;topLikes.forEach(([k,c])=>html+=`<div class="ai-item"><div class="ai-icon up">✓</div><div class="ai-text">${k} <span style="color:var(--text-dim)">(${c}人提及)</span></div></div>`)}
+  if(topDislikes.length){html+=`<div style="font-size:12px;color:var(--text-dim);margin:8px 0 6px">客户认为不足</div>`;topDislikes.forEach(([k,c])=>html+=`<div class="ai-item"><div class="ai-icon down">!</div><div class="ai-text">${k} <span style="color:var(--text-dim)">(${c}人提及)</span></div></div>`)}
+  return html||`<div style="font-size:13px;color:var(--text-dim)">暂无分析数据</div>`;
+}
+
+function generateSuggestions(propId){
+  const p=getProp(propId);if(!p)return;
+  const propViewings=state.viewings.filter(v=>v.propertyId===propId);
+  const weekV=propViewings.filter(v=>isThisWeek(v.viewingTime));
+  const suggestions=[];
+  const allDislikes=propViewings.flatMap(v=>v.dislikes||[]);
+  if(weekV.length<3)suggestions.push({type:'价格调整',text:'本周带看较少，建议价格下调3%-5%以吸引客户'});
+  if(allDislikes.includes('厨房偏旧')||allDislikes.includes('厨房偏小'))suggestions.push({type:'图片优化',text:'客户反馈厨房有不足，建议更换厨房照片或装修'});
+  if(!p.videoUrl)suggestions.push({type:'营销',text:'建议增加夜景视频，提升房源吸引力'});
+  if(!p.vrUrl)suggestions.push({type:'营销',text:'建议拍摄VR全景，增强线上体验'});
+  if((p.stats?.views||0)>100&&(p.stats?.bookings||0)<5)suggestions.push({type:'推广',text:'浏览量高但预约少，建议增加开放日活动'});
+  if(allDislikes.includes('价格偏高'))suggestions.push({type:'价格调整',text:'多位客户反馈价格偏高，建议与房东沟通调整报价'});
+  if(allDislikes.includes('车位少'))suggestions.push({type:'推广',text:'客户关注车位，建议补充车位信息或协调车位方案'});
+  if(suggestions.length===0)suggestions.push({type:'推广',text:'当前数据表现良好，继续保持现有推广策略'});
+  suggestions.forEach(s=>s.id=uid());
+  p.suggestions=suggestions;saveState();viewPropertyDetail(propId);toast('AI建议已生成');
+}
+
+function openSuggestionForm(propId,suggestionId){
+  const p=getProp(propId);if(!p)return;
+  const isEdit=!!suggestionId;
+  const s=isEdit?(p.suggestions||[]).find(x=>x.id===suggestionId):null;
+  let overlay=document.getElementById('suggestionFormOverlay');
+  if(!overlay){overlay=document.createElement('div');overlay.className='form-overlay';overlay.id='suggestionFormOverlay';document.body.appendChild(overlay)}
+  overlay.className='form-overlay active';
+  overlay.innerHTML='<div class="form-sheet"><div class="form-header"><h2>'+(isEdit?'编辑建议':'新增建议')+'</h2><div class="form-close" onclick="document.getElementById(\'suggestionFormOverlay\').classList.remove(\'active\')">×</div></div><div class="form-body"><div class="form-group"><label>建议类型</label><select class="form-select" id="sf_type"><option>价格调整</option><option>营销</option><option>图片优化</option><option>推广</option></select></div><div class="form-group"><label>建议内容</label><textarea class="form-textarea" id="sf_text" placeholder="输入建议内容..."></textarea></div></div><div class="form-footer">'+(isEdit?'<button class="btn btn-danger" onclick="deleteSuggestion(\''+propId+'\',\''+suggestionId+'\');document.getElementById(\'suggestionFormOverlay\').classList.remove(\'active\')">删除</button>':'')+'<button class="btn btn-secondary btn-full" onclick="document.getElementById(\'suggestionFormOverlay\').classList.remove(\'active\')">取消</button><button class="btn btn-primary btn-full" onclick="saveSuggestion(\''+propId+'\',\''+(suggestionId||'')+'\')">保存</button></div></div>';
+  document.body.appendChild(overlay);
+  if(isEdit){document.getElementById('sf_type').value=s.type;document.getElementById('sf_text').value=s.text}
+}
+
+function saveSuggestion(propId,suggestionId){
+  const p=getProp(propId);if(!p)return;
+  const type=document.getElementById('sf_type').value;
+  const text=document.getElementById('sf_text').value.trim();
+  if(!text){toast('请填写建议内容');return}
+  if(!p.suggestions)p.suggestions=[];
+  if(suggestionId){const idx=p.suggestions.findIndex(s=>s.id===suggestionId);if(idx>=0)p.suggestions[idx]={...p.suggestions[idx],type,text}}
+  else{p.suggestions.push({id:uid(),type,text})}
+  saveState();document.getElementById('suggestionFormOverlay').remove();viewPropertyDetail(propId);toast('建议已保存');
+}
+
+function deleteSuggestion(propId,suggestionId){
+  const p=getProp(propId);if(!p)return;
+  if(!confirm('确定删除此建议？'))return;
+  p.suggestions=(p.suggestions||[]).filter(s=>s.id!==suggestionId);
+  saveState();const o=document.getElementById('suggestionFormOverlay');if(o)o.remove();viewPropertyDetail(propId);toast('已删除');
+}
+
+function showReport(propId){
+  try{
+    const p=getProp(propId);
+    if(!p){toast('未找到房源信息');return}
+    const propViewings=state.viewings.filter(v=>v.propertyId===propId);
+    const weekV=propViewings.filter(v=>isThisWeek(v.viewingTime));
+    // 提取反馈
+    const likesCount={},dislikesCount={};
+    propViewings.forEach(v=>{(v.likes||[]).forEach(k=>likesCount[k]=(likesCount[k]||0)+1);(v.dislikes||[]).forEach(k=>dislikesCount[k]=(dislikesCount[k]||0)+1)});
+    const topLikes=Object.entries(likesCount).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
+    const topDislikes=Object.entries(dislikesCount).sort((a,b)=>b[1]-a[1]).slice(0,3).map(e=>e[0]);
+    // 建议
+    const sugs=(p.suggestions||[]).map(s=>'  '+s.type+'：'+s.text).join('\n');
+    const stats=p.stats||{};
+    const agentName=(state.agent&&state.agent.name)||'YUKI';
+    const agentPhone=(state.agent&&state.agent.phone)?'· '+state.agent.phone:'';
+
+    const report=`【${p.name}】房东周报
+日期：${formatDate(new Date())}
+
+一、本周数据
+  带看：${weekV.length}组
+  预约：${stats.bookings||0}组
+  收藏：${stats.favorites||0}次
+  咨询：${stats.inquiries||0}次
+  分享：${stats.shares||0}次
+
+二、客户反馈
+  客户最喜欢：${topLikes.join('、')||'暂无数据'}
+  客户认为不足：${topDislikes.join('、')||'暂无数据'}
+
+三、本周建议
+${sugs||'  暂无建议，请先生成'}
+
+四、预计下周
+  预约：${Math.ceil(weekV.length*0.8)}组
+  成交率：${weekV.length>0?Math.min(weekV.length*10,80):30}%
+
+——${agentName} ${agentPhone}`;
+
+    const contentEl=document.getElementById('reportContent');
+    const overlayEl=document.getElementById('reportOverlay');
+    if(!contentEl){toast('周报组件未找到');return}
+    if(!overlayEl){toast('周报弹窗未找到');return}
+    contentEl.textContent=report;
+    overlayEl.classList.add('active');
+  }catch(e){
+    console.error('showReport error:',e);
+    toast('生成周报失败：'+e.message);
+  }
+}
+
+function showReportForCurrent(){
+  if(state.currentPropertyId)showReport(state.currentPropertyId);
+  else toast('请先选择房源');
+}
+
+function copyReport(){
+  const text=document.getElementById('reportContent').textContent;
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>toast('已复制到剪贴板'))}
+  else{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('已复制到剪贴板')}
+}
+
+function printReport(){
+  const overlay=document.getElementById('reportOverlay');
+  const wasActive=overlay.classList.contains('active');
+  if(!wasActive)overlay.classList.add('active');
+  window.print();
+  if(!wasActive)overlay.classList.remove('active');
+}
+
+function shareReportToWeChat(){
+  const text=document.getElementById('reportContent').textContent;
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>{toast('已复制到剪贴板，请粘贴到微信发送');setTimeout(()=>{try{window.location.href='weixin://'}catch(e){}},1000)})}
+  else{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('已复制到剪贴板，请粘贴到微信发送')}
+}
+
+function emailReport(){
+  const text=document.getElementById('reportContent').textContent;
+  const subject=text.split('\n')[0]||'房东周报';
+  const body=encodeURIComponent(text);
+  window.location.href=`mailto:?subject=${encodeURIComponent(subject)}&body=${body}`;
+}
+
+// ===== 客户列表 =====
+function filterClientBy(f,el){state.clientFilter=f;document.querySelectorAll('#clientFilterTabs .filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderClients()}
+function renderClients(){
+  let list=state.clients;
+  if(state.clientFilter!=='all')list=list.filter(c=>c.level===state.clientFilter);
+  const c=document.getElementById('clientList');
+  if(list.length===0){c.innerHTML=`<div class="empty"><div class="icon">○</div><p>暂无客户</p></div>`;return}
+  c.innerHTML=list.map(cl=>{
+    const viewings=state.viewings.filter(v=>v.clientName===cl.name||v.clientId===cl.id);
+    const status=cl.nextAction?`${cl.nextAction.type}：${cl.nextAction.note}`:'暂无安排';
+    return `<div class="client-card" onclick="viewClientDetail('${cl.id}')">
+      <div class="cc-top">
+        <div class="cc-avatar">${cl.name[0]}</div>
+        <div class="cc-info">
+          <div class="cc-name">${cl.name} <span style="font-size:12px;color:var(--text-dim)">· ${cl.type}</span></div>
+          <div class="cc-meta">${cl.budget}万 · ${cl.area||'不限'} · ${cl.layout||'不限'}</div>
+        </div>
+        <span class="badge level-${cl.level}">${cl.level}</span>
+      </div>
+      <div class="cc-status">${status}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== 客户工作台(6模块) =====
+function viewClientDetail(id){
+  const cl=getClient(id);if(!cl)return;
+  state._currentClientId=id;
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-client-detail').classList.add('active');
+
+  const clientViewings=state.viewings.filter(v=>v.clientName===cl.name||v.clientId===cl.id).sort((a,b)=>new Date(b.viewingTime)-new Date(a.viewingTime));
+  const clientFollowUps=state.followUps.filter(f=>f.clientId===id).sort((a,b)=>new Date(b.time)-new Date(a.time));
+
+  // 今日看房计划：从带看记录和待办中合并
+  const todayViewingRecords=clientViewings.filter(v=>isToday(v.viewingTime));
+  const todayTodoViewings=state.todos.filter(t=>(t.clientId===id||(t.title&&t.title.includes(cl.name)))&&!t.tomorrow&&t.type==='带看'&&t.propertyId);
+  const todayPlan=[];const seenProps=new Set();
+  todayViewingRecords.forEach(v=>{if(!seenProps.has(v.propertyId)){seenProps.add(v.propertyId);todayPlan.push({propertyId:v.propertyId,time:formatTimeShort(v.viewingTime),done:true})}});
+  todayTodoViewings.forEach(t=>{if(!seenProps.has(t.propertyId)){seenProps.add(t.propertyId);todayPlan.push({propertyId:t.propertyId,time:t.startTime||t.time||'--:--',done:t.done})}});
+  todayPlan.sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+
+  // 兼容旧格式 recommended
+  const recList=(cl.recommended||[]).map(r=>{if(typeof r==='string')return{propertyId:r,status:'已推荐'};return r});
+
+  document.getElementById('clientDetailContent').innerHTML=`
+    <div class="cd-header">
+      <div class="cd-avatar">${cl.name[0]}</div>
+      <div class="cd-name">${cl.name}</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:3px">${cl.phone||'未留电话'} · ${cl.job||'-'}</div>
+      <div class="cd-level"><span class="badge level-${cl.level}">客户等级 ${cl.level}</span></div>
+    </div>
+
+    <!-- 模块1: 客户信息 -->
+    <div class="section">
+      <div class="card">
+        <div class="card-title">客户信息</div>
+        <div class="info-grid">
+          <div class="ig-item"><div class="ig-label">预算</div><div class="ig-value">${cl.budget}万</div></div>
+          <div class="ig-item"><div class="ig-label">区域</div><div class="ig-value">${cl.area||'不限'}</div></div>
+          <div class="ig-item"><div class="ig-label">户型</div><div class="ig-value">${cl.layout||'不限'}</div></div>
+          <div class="ig-item"><div class="ig-label">类型</div><div class="ig-value">${cl.type||'-'}</div></div>
+          <div class="ig-item"><div class="ig-label">付款</div><div class="ig-value">${cl.payment||'-'}</div></div>
+          <div class="ig-item"><div class="ig-label">家庭</div><div class="ig-value">${cl.family||'-'}</div></div>
+          <div class="ig-item"><div class="ig-label">职业</div><div class="ig-value">${cl.job||'-'}</div></div>
+          <div class="ig-item"><div class="ig-label">客户类型</div><div class="ig-value">${cl.type||'-'}</div></div>
+        </div>
+        ${cl.requirements?`<div style="margin-top:10px"><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">需求</div><div style="font-size:13px;color:var(--text-mid)">${cl.requirements}</div></div>`:''}
+        ${cl.notes?`<div style="margin-top:8px"><div style="font-size:12px;color:var(--text-dim);margin-bottom:4px">备注</div><div style="font-size:13px;color:var(--text-mid)">${cl.notes}</div></div>`:''}
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn btn-outline btn-sm" style="flex:1" onclick="editClient('${cl.id}')">编辑</button>
+          <button class="btn btn-primary btn-sm" style="flex:1" onclick="openViewingForm(null,'${cl.id}')">+ 新增带看</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteClient('${cl.id}')">删除</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 模块1.5: 今日看房计划 -->
+    <div class="section">
+      <div class="card">
+        <div class="card-title">今日看房计划 <span class="more">${todayPlan.length}场</span></div>
+        ${todayPlan.length===0?`<div class="empty"><div class="icon">○</div><p>今日暂无看房安排</p></div>`:
+          todayPlan.map(item=>{const p=getProp(item.propertyId);return `<div class="viewing-plan-item" onclick="viewPropertyDetail('${item.propertyId}');setTimeout(()=>{document.getElementById('page-client-detail').classList.remove('active')},0)">
+            <div class="vpi-time">${item.time}</div>
+            <div class="vpi-info"><div class="vpi-name">${p?p.name:'未知房源'}</div><div class="vpi-price">${p?formatPriceHTML(p.price):'-'}</div></div>
+            <div class="vpi-status ${item.done?'done':'pending'}">${item.done?'已完成':'待看房'}</div>
+          </div>`}).join('')}
+      </div>
+    </div>
+
+    <!-- 模块2: 推荐房源 -->
+    <div class="section">
+      <div class="card">
+        <div class="card-title">推荐房源 <span class="more">${recList.length}套</span><button class="btn btn-outline btn-sm" style="margin-left:8px;padding:4px 10px;font-size:12px" onclick="openPropertySelector('${cl.id}')">+ 推荐</button></div>
+        ${recList.length===0?`<div class="empty"><div class="icon">○</div><p>暂无推荐房源</p></div>`:
+          recList.map(rec=>{const p=getProp(rec.propertyId);if(!p)return'';const viewed=clientViewings.find(v=>v.propertyId===rec.propertyId);const stars=viewed?'★'.repeat(viewed.rating||4)+'☆'.repeat(5-(viewed.rating||4)):'';
+          return `<div class="rec-item" style="flex-direction:column;align-items:stretch" onclick="viewPropertyDetail('${rec.propertyId}');setTimeout(()=>{document.getElementById('page-client-detail').classList.remove('active')},0)">
+            <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+              <div class="rec-left"><div class="rec-name">${p.name} <span class="rec-status-tag rec-status-${rec.status||'已推荐'}">${rec.status||'已推荐'}</span></div><div class="rec-status">${viewed?'已带看 · '+(viewed.feedback||''):'未带看 · '+formatPrice(p.price)}</div></div>
+              ${viewed?`<div class="rec-stars">${stars}</div>`:'<div style="font-size:12px;color:var(--gold)">→</div>'}
+            </div>
+            <div class="rec-actions" onclick="event.stopPropagation()">
+              <button class="rec-action-btn" onclick="cycleRecStatus('${cl.id}','${rec.propertyId}')">切换状态</button>
+              <button class="rec-action-btn danger" onclick="removeRecommendation('${cl.id}','${rec.propertyId}')">移除</button>
+            </div>
+          </div>`}).join('')}
+      </div>
+    </div>
+
+    <!-- 模块3: 浏览记录 -->
+    <div class="section">
+      <div class="card">
+        <div class="card-title">浏览记录 <span class="more">${(cl.viewed||[]).length}套</span></div>
+        ${(cl.viewed||[]).length===0?`<div class="empty"><div class="icon">○</div><p>暂无浏览记录</p></div>`:
+          cl.viewed.map(v=>{const p=getProp(v.propertyId);return p?`<div class="rec-item" onclick="viewPropertyDetail('${p.id}')"><div class="rec-left"><div class="rec-name">${p.name}</div><div class="rec-status">浏览${v.count}次 · ${formatPrice(p.price)}</div></div></div>`:''}).join('')}
+        ${(cl.favorited||[]).length?`<div style="margin-top:8px;font-size:12px;color:var(--text-dim)">收藏</div>${cl.favorited.map(pid=>{const p=getProp(pid);return p?`<span class="tag tag-blue">${p.name}</span>`:''}).join('')}`:''}
+      </div>
+    </div>
+
+    <!-- 模块4: 带看历史 -->
+    <div class="section">
+      <div class="card">
+        <div class="card-title">带看历史 <span class="more">${clientViewings.length}场</span></div>
+        ${clientViewings.length===0?`<div class="empty"><div class="icon">○</div><p>暂无带看记录</p></div>`:
+          clientViewings.map(v=>{const p=getProp(v.propertyId);const stars='★'.repeat(v.rating||4)+'☆'.repeat(5-(v.rating||4));return `<div class="viewing-block" style="cursor:pointer" onclick="event.stopPropagation();openViewingForm(null,null,'${v.id}')">
+            <div class="vb-header"><div><span class="vb-time">${formatTimeShort(v.viewingTime)}</span> <span class="vb-client">${p?.name||''}</span></div><div class="stars">${stars}</div></div>
+            ${v.likes&&v.likes.length?`<div class="vb-row"><div class="vb-label">喜欢</div><div class="vb-content" style="color:var(--green)">${v.likes.join('、')}</div></div>`:''}
+            ${v.dislikes&&v.dislikes.length?`<div class="vb-row"><div class="vb-label">不足</div><div class="vb-content" style="color:var(--red)">${v.dislikes.join('、')}</div></div>`:''}
+            ${v.feedback?`<div class="vb-row"><div class="vb-label">反馈</div><div class="vb-content">${v.feedback}</div></div>`:''}
+          </div>`}).join('')}
+      </div>
+    </div>
+
+    <!-- 模块5: 跟进记录 -->
+    <div class="section">
+      <div class="card">
+        <div class="card-title">跟进记录 <span class="more">${clientFollowUps.length}条</span><button class="btn btn-outline btn-sm" style="margin-left:8px;padding:4px 10px;font-size:12px" onclick="openFollowUpForm('${cl.id}')">+ 新增</button></div>
+        ${clientFollowUps.length===0?`<div class="empty"><div class="icon">○</div><p>暂无跟进记录</p></div>`:
+          `<div class="timeline">${clientFollowUps.map(f=>`<div class="tl-item"><div style="display:flex;justify-content:space-between;align-items:center"><div class="tl-type">${f.type}</div><div style="display:flex;gap:6px"><button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:var(--bg-card2);color:var(--text-dim)" onclick="event.stopPropagation();openFollowUpForm('${cl.id}','${f.id}')">编辑</button><button class="btn btn-sm" style="padding:2px 8px;font-size:11px;background:rgba(229,57,53,.1);color:var(--red)" onclick="event.stopPropagation();deleteFollowUp('${f.id}')">删除</button></div></div><div class="tl-content">${f.content}</div><div class="tl-time">${formatTime(f.time)}</div></div>`).join('')}</div>`}
+      </div>
+    </div>
+
+    <!-- 模块6: 下一步计划 -->
+    <div class="section">
+      <div class="card">
+        <div class="card-title">下一步计划</div>
+        ${cl.nextAction?`
+          <div class="vb-row"><div class="vb-label">类型</div><div class="vb-content">${cl.nextAction.type}</div></div>
+          <div class="vb-row"><div class="vb-label">时间</div><div class="vb-content">${formatTime(cl.nextAction.time)}</div></div>
+          ${cl.nextAction.propertyId?`<div class="vb-row"><div class="vb-label">房源</div><div class="vb-content">${getPropName(cl.nextAction.propertyId)}</div></div>`:''}
+          <div class="vb-row"><div class="vb-label">备注</div><div class="vb-content">${cl.nextAction.note}</div></div>
+        `:`<div class="empty"><div class="icon">○</div><p>暂无计划</p></div>`}
+      </div>
+    </div>
+  `;
+}
+
+// ===== 我的 =====
+function renderProfile(){
+  const totalV=state.viewings.length;
+  const dealtCount=state.properties.filter(p=>p.status==='已售'||p.status==='预订').length;
+  const aCount=state.clients.filter(c=>c.level==='A').length;
+  document.getElementById('pfName').textContent=state.agent.name;
+  document.getElementById('pfAvatar').textContent=state.agent.avatar||state.agent.name[0];
+  document.getElementById('pfTitle').textContent=state.agent.title;
+  document.getElementById('profileStats').innerHTML=`
+    <div class="ps-item"><div class="ps-value">${state.properties.length}</div><div class="ps-label">房源</div></div>
+    <div class="ps-item"><div class="ps-value">${state.clients.length}</div><div class="ps-label">客户</div></div>
+    <div class="ps-item"><div class="ps-value">${totalV}</div><div class="ps-label">带看</div></div>
+  `;
+  const miP=document.getElementById('mi-prop-count');if(miP)miP.textContent=state.properties.length+'套 ›';
+  const miC=document.getElementById('mi-client-count');if(miC)miC.textContent=state.clients.length+'位 ›';
+  const miV=document.getElementById('mi-viewing-count');if(miV)miV.textContent=totalV+'场 ›';
+}
+
+function openAgentEditForm(){
+  document.getElementById('af_avatar').value=state.agent.avatar||'';
+  document.getElementById('af_name').value=state.agent.name||'';
+  document.getElementById('af_title').value=state.agent.title||'';
+  document.getElementById('af_company').value=state.agent.company||'';
+  document.getElementById('af_phone').value=state.agent.phone||'';
+  document.getElementById('af_wechat').value=state.agent.wechat||'';
+  document.getElementById('agentFormOverlay').classList.add('active');
+}
+function saveAgent(){
+  const name=document.getElementById('af_name').value.trim();if(!name){toast('请填写姓名');return}
+  state.agent.avatar=document.getElementById('af_avatar').value.trim();
+  state.agent.name=name;
+  state.agent.title=document.getElementById('af_title').value.trim();
+  state.agent.company=document.getElementById('af_company').value.trim();
+  state.agent.phone=document.getElementById('af_phone').value.trim();
+  state.agent.wechat=document.getElementById('af_wechat').value.trim();
+  saveState();closeForm('agentFormOverlay');renderProfile();toast('信息已更新');
+}
+
+// ===== 带看列表 =====
+state.viewingFilter='all';
+function showViewingList(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-viewings').classList.add('active');
+  renderViewingsList();window.scrollTo(0,0);
+}
+function filterViewingBy(f,el){
+  state.viewingFilter=f;
+  document.querySelectorAll('#viewingFilterTabs .filter-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');renderViewingsList();
+}
+function renderViewingsList(){
+  let list=[...state.viewings].sort((a,b)=>new Date(b.viewingTime)-new Date(a.viewingTime));
+  if(state.viewingFilter==='today')list=list.filter(v=>isToday(v.viewingTime));
+  else if(state.viewingFilter==='week')list=list.filter(v=>isThisWeek(v.viewingTime));
+  else if(state.viewingFilter==='month'){const now=new Date();list=list.filter(v=>{const d=new Date(v.viewingTime);return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear()})}
+  document.getElementById('viewingListCount').textContent=list.length+'场';
+  const c=document.getElementById('viewingListContainer');
+  if(list.length===0){c.innerHTML=`<div class="empty"><div class="icon">○</div><p>暂无带看记录</p></div>`;return}
+  c.innerHTML=list.map(v=>{
+    const p=getProp(v.propertyId);const stars='★'.repeat(v.rating||4)+'☆'.repeat(5-(v.rating||4));
+    return `<div class="viewing-list-card" onclick="openViewingForm(null,null,'${v.id}')">
+      <div class="vlc-top">
+        <div><div class="vlc-prop">${p?p.name:'未知房源'}</div><div class="vlc-client">${v.clientName} · ${v.duration}分钟</div></div>
+        <div style="text-align:right"><div class="vlc-time">${formatTime(v.viewingTime)}</div><div class="stars" style="margin-top:2px">${stars}</div></div>
+      </div>
+      ${v.feedback?`<div style="font-size:12px;color:var(--text-dim);line-height:1.4">${v.feedback.slice(0,50)}${v.feedback.length>50?'...':''}</div>`:''}
+      <div class="vlc-tags">
+        ${v.likes&&v.likes.length?v.likes.slice(0,3).map(l=>`<span class="tag tag-green">${l}</span>`).join(''):''}
+        ${v.dislikes&&v.dislikes.length?v.dislikes.slice(0,2).map(l=>`<span class="tag" style="background:rgba(239,83,53,.15);color:var(--red)">${l}</span>`).join(''):''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== 房源表单 =====
+function openPropertyForm(){
+  document.getElementById('propertyFormTitle').textContent='新增房源';
+  ['pf_id','pf_name','pf_address','pf_area','pf_price','pf_layout','pf_floor','pf_highlights','pf_tags','pf_facilities','pf_parking','pf_description','pf_ownerMindset','pf_schools','pf_medical','pf_transport','pf_commercial','pf_fee','pf_life'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('pf_type').value='大平层';document.getElementById('pf_status').value='在售';document.getElementById('pf_exclusive').value='true';
+  document.getElementById('pf_decoration').value='';document.getElementById('pf_orientation').value='';
+  state.tempPropImages=[];state.tempPropCoverIndex=0;document.getElementById('pf_imagePreview').innerHTML='';
+  document.getElementById('propertyFormOverlay').classList.add('active');
+}
+function editProperty(id){
+  const p=getProp(id);if(!p)return;
+  document.getElementById('propertyFormTitle').textContent='编辑房源';
+  document.getElementById('pf_id').value=p.id;document.getElementById('pf_name').value=p.name;
+  document.getElementById('pf_address').value=p.address||'';document.getElementById('pf_area').value=p.area||'';
+  document.getElementById('pf_price').value=p.price||'';document.getElementById('pf_layout').value=p.layout||'';
+  document.getElementById('pf_floor').value=p.floor||'';document.getElementById('pf_type').value=p.type||'大平层';
+  document.getElementById('pf_status').value=p.status||'在售';document.getElementById('pf_exclusive').value=p.exclusive?'true':'false';
+  document.getElementById('pf_parking').value=p.parking||'';document.getElementById('pf_highlights').value=(p.highlights||[]).join(',');
+  document.getElementById('pf_tags').value=(p.tags||[]).join(',');document.getElementById('pf_facilities').value=(p.facilities||[]).join(',');
+  document.getElementById('pf_description').value=p.description||'';
+  document.getElementById('pf_ownerMindset').value=p.ownerMindset||'';
+  document.getElementById('pf_schools').value=(p.surroundings?.schools||[]).join(',');
+  document.getElementById('pf_medical').value=(p.surroundings?.medical||[]).join(',');
+  document.getElementById('pf_transport').value=(p.surroundings?.transport||[]).join(',');
+  document.getElementById('pf_commercial').value=(p.surroundings?.commercial||[]).join(',');
+  document.getElementById('pf_fee').value=p.fee||'';
+  document.getElementById('pf_decoration').value=p.decoration||'';
+  document.getElementById('pf_orientation').value=p.orientation||'';
+  document.getElementById('pf_life').value=(p.surroundings?.life||[]).join(',');
+  state.tempPropImages=p.images||[];state.tempPropCoverIndex=p.coverIndex||0;renderPropertyImagePreview();
+  document.getElementById('propertyFormOverlay').classList.add('active');
+}
+function handlePropertyImages(e){const files=e.target.files;for(const f of files){compressImage(f,800,.7).then(d=>{state.tempPropImages.push(d);renderPropertyImagePreview()})}e.target.value=''}
+function renderPropertyImagePreview(){
+  const coverIdx=state.tempPropCoverIndex||0;
+  document.getElementById('pf_imagePreview').innerHTML=state.tempPropImages.map((img,i)=>{
+    const isCover=i===coverIdx;
+    return `<div class="image-preview" style="position:relative">
+      <img src="${img}" onclick="event.stopPropagation();openImageViewer('${img}')" style="${isCover?'border:2px solid var(--gold);box-shadow:0 0 8px rgba(201,169,97,.4)':''}">
+      ${isCover?'<div style="position:absolute;top:2px;left:2px;background:var(--gold);color:#0a0a0a;font-size:9px;padding:1px 4px;border-radius:3px;font-weight:600">封面</div>':''}
+      <div class="ip-cover" onclick="event.stopPropagation();state.tempPropCoverIndex=${i};renderPropertyImagePreview()" style="position:absolute;bottom:2px;left:2px;background:rgba(0,0,0,.7);color:${isCover?'var(--gold)':'#ccc'};font-size:9px;padding:1px 4px;border-radius:3px;cursor:pointer">${isCover?'✓ 封面':'设为封面'}</div>
+      <div class="ip-remove" onclick="event.stopPropagation();state.tempPropImages.splice(${i},1);if(state.tempPropCoverIndex>=state.tempPropImages.length)state.tempPropCoverIndex=0;renderPropertyImagePreview()">×</div>
+    </div>`;
+  }).join('');
+}
+function saveProperty(){
+  const name=document.getElementById('pf_name').value.trim();if(!name){toast('请填写房源名称');return}
+  const id=document.getElementById('pf_id').value;
+  const data={
+    name,address:document.getElementById('pf_address').value.trim(),
+    area:parseFloat(document.getElementById('pf_area').value)||0,
+    price:parseFloat(document.getElementById('pf_price').value)||0,
+    layout:document.getElementById('pf_layout').value.trim(),
+    floor:document.getElementById('pf_floor').value.trim(),
+    type:document.getElementById('pf_type').value,status:document.getElementById('pf_status').value,
+    exclusive:document.getElementById('pf_exclusive').value==='true',
+    parking:document.getElementById('pf_parking').value.trim(),
+    highlights:document.getElementById('pf_highlights').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t),
+    tags:document.getElementById('pf_tags').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t),
+    facilities:document.getElementById('pf_facilities').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t),
+    description:document.getElementById('pf_description').value.trim(),
+    ownerMindset:document.getElementById('pf_ownerMindset').value.trim(),
+    images:state.tempPropImages,
+    coverIndex:state.tempPropCoverIndex||0,
+    fee:document.getElementById('pf_fee').value.trim(),
+    decoration:document.getElementById('pf_decoration').value,
+    orientation:document.getElementById('pf_orientation').value
+  };
+  // 周边配套
+  const surroundings={};
+  const schools=document.getElementById('pf_schools').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t);
+  const medical=document.getElementById('pf_medical').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t);
+  const transport=document.getElementById('pf_transport').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t);
+  const commercial=document.getElementById('pf_commercial').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t);
+  if(schools.length)surroundings.schools=schools;
+  if(medical.length)surroundings.medical=medical;
+  if(transport.length)surroundings.transport=transport;
+  if(commercial.length)surroundings.commercial=commercial;
+  const life=document.getElementById('pf_life').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t);
+  if(life.length)surroundings.life=life;
+  if(Object.keys(surroundings).length)data.surroundings=surroundings;
+  if(id){const idx=state.properties.findIndex(p=>p.id===id);state.properties[idx]={...state.properties[idx],...data};toast('房源已更新')}
+  else{state.properties.push({id:uid(),...data,videoUrl:'',vrUrl:'',floorPlan:'',stats:{views:0,favorites:0,inquiries:0,bookings:0,shares:0},createTime:new Date().toISOString()});if(!state.currentPropertyId)state.currentPropertyId=state.properties[state.properties.length-1].id;toast('房源已添加')}
+  saveState();updateCurrentPropertyDisplay();closeForm('propertyFormOverlay');renderProperties();
+}
+
+function deleteProperty(id){
+  if(!confirm('确定删除此房源？相关带看记录会保留但不再关联房源。'))return;
+  state.properties=state.properties.filter(p=>p.id!==id);
+  if(state.currentPropertyId===id)state.currentPropertyId=state.properties[0]?.id||null;
+  saveState();updateCurrentPropertyDisplay();switchTab('properties');toast('房源已删除');
+}
+
+// ===== 房源跟进情况 =====
+function openPropFollowUpForm(propId,followUpId){
+  const isEdit=!!followUpId;
+  const p=getProp(propId);if(!p)return;
+  const f=isEdit?((p.followUps||[]).find(x=>x.id===followUpId)):null;
+  document.getElementById('propFollowUpFormTitle').textContent=isEdit?'编辑跟进':'新增跟进';
+  document.getElementById('pfu_id').value=isEdit?f.id:'';
+  document.getElementById('pfu_propId').value=propId;
+  document.getElementById('pfu_type').value=isEdit?(f.type||'电话'):'电话';
+  document.getElementById('pfu_target').value=isEdit?(f.target||'房东'):'房东';
+  document.getElementById('pfu_content').value=isEdit?(f.content||''):'';
+  const now=new Date();now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
+  document.getElementById('pfu_time').value=isEdit?(f.time?f.time.slice(0,16):''):now.toISOString().slice(0,16);
+  document.getElementById('pfu_deleteBtn').style.display=isEdit?'inline-flex':'none';
+  document.getElementById('propFollowUpFormOverlay').classList.add('active');
+}
+function savePropFollowUp(){
+  const content=document.getElementById('pfu_content').value.trim();
+  if(!content){toast('请填写跟进内容');return}
+  const propId=document.getElementById('pfu_propId').value;
+  const id=document.getElementById('pfu_id').value;
+  const p=getProp(propId);if(!p)return;
+  if(!p.followUps)p.followUps=[];
+  const data={
+    type:document.getElementById('pfu_type').value,
+    target:document.getElementById('pfu_target').value,
+    content,
+    time:document.getElementById('pfu_time').value?new Date(document.getElementById('pfu_time').value).toISOString():new Date().toISOString()
+  };
+  if(id){
+    const idx=p.followUps.findIndex(f=>f.id===id);
+    if(idx>=0)p.followUps[idx]={...p.followUps[idx],...data};
+    toast('跟进已更新');
+  }else{
+    p.followUps.push({id:uid(),...data,createTime:new Date().toISOString()});
+    toast('跟进已添加');
+  }
+  saveState();closeForm('propFollowUpFormOverlay');viewPropertyDetail(propId);
+}
+function deletePropFollowUpFromForm(){
+  const propId=document.getElementById('pfu_propId').value;
+  const id=document.getElementById('pfu_id').value;
+  if(!id||!confirm('确定删除此跟进记录？'))return;
+  const p=getProp(propId);if(!p)return;
+  p.followUps=(p.followUps||[]).filter(f=>f.id!==id);
+  saveState();closeForm('propFollowUpFormOverlay');viewPropertyDetail(propId);toast('已删除');
+}
+function deletePropFollowUp(propId,fid){
+  if(!confirm('确定删除此跟进记录？'))return;
+  const p=getProp(propId);if(!p)return;
+  p.followUps=(p.followUps||[]).filter(f=>f.id!==fid);
+  saveState();viewPropertyDetail(propId);toast('已删除');
+}
+
+function scrollToViewingSection(){
+  const cards=document.querySelectorAll('#propertyDetailInfo .card');
+  if(cards[3])cards[3].scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function showTodayBookings(propId){
+  const p=getProp(propId);if(!p)return;
+  toast(`今日预约 ${p.stats?.bookings||0} 组`);
+}
+
+// ===== 周边配套增改删 =====
+function openSurroundingForm(propId,cat,idx){
+  const p=getProp(propId);if(!p)return;
+  const isEdit=cat!==undefined&&idx!==undefined;
+  document.getElementById('surroundingFormTitle').textContent=isEdit?'编辑配套项':'新增配套项';
+  document.getElementById('sf_propId').value=propId;
+  document.getElementById('sf_cat').value=cat||'';
+  document.getElementById('sf_idx').value=idx!==undefined?idx:'';
+  if(isEdit){
+    document.getElementById('sf_category').value=cat;
+    const item=(p.surroundings?.[cat]||[])[idx];
+    document.getElementById('sf_name').value=typeof item==='string'?item:(item?.name||'');
+    document.getElementById('sf_deleteBtn').style.display='flex';
+  }else{
+    document.getElementById('sf_category').value='transport';
+    document.getElementById('sf_name').value='';
+    document.getElementById('sf_deleteBtn').style.display='none';
+  }
+  document.getElementById('surroundingFormOverlay').classList.add('active');
+}
+function saveSurrounding(){
+  const propId=document.getElementById('sf_propId').value;
+  const oldCat=document.getElementById('sf_cat').value;
+  const idx=document.getElementById('sf_idx').value;
+  const newCat=document.getElementById('sf_category').value;
+  const name=document.getElementById('sf_name').value.trim();
+  if(!name){toast('请填写名称');return}
+  const p=getProp(propId);if(!p)return;
+  if(!p.surroundings)p.surroundings={};
+  if(!p.surroundings[newCat])p.surroundings[newCat]=[];
+  // 编辑模式：如果是改分类或改名称
+  if(idx!==''){
+    // 先从旧分类删除
+    if(oldCat&&oldCat!==newCat){
+      p.surroundings[oldCat].splice(parseInt(idx),1);
+      p.surroundings[newCat].push(name);
+    }else{
+      p.surroundings[newCat][parseInt(idx)]=name;
+    }
+  }else{
+    p.surroundings[newCat].push(name);
+  }
+  saveState();closeForm('surroundingFormOverlay');
+  if(state.currentPropertyId===propId)viewPropertyDetail(propId);
+  toast('已保存');
+}
+function deleteSurroundingFromForm(){
+  const propId=document.getElementById('sf_propId').value;
+  const cat=document.getElementById('sf_cat').value;
+  const idx=document.getElementById('sf_idx').value;
+  if(idx==='')return;
+  if(!confirm('确定删除此配套项？'))return;
+  const p=getProp(propId);if(!p)return;
+  if(p.surroundings?.[cat])p.surroundings[cat].splice(parseInt(idx),1);
+  saveState();closeForm('surroundingFormOverlay');
+  if(state.currentPropertyId===propId)viewPropertyDetail(propId);
+  toast('已删除');
+}
+function deleteSurrounding(propId,cat,idx){
+  if(!confirm('确定删除此配套项？'))return;
+  const p=getProp(propId);if(!p)return;
+  if(p.surroundings?.[cat])p.surroundings[cat].splice(idx,1);
+  saveState();viewPropertyDetail(propId);toast('已删除');
+}
+
+function openMapNav(addrEncoded){
+  const addr=decodeURIComponent(addrEncoded);
+  const overlay=document.createElement('div');
+  overlay.className='form-overlay active';overlay.id='mapNavOverlay';
+  overlay.innerHTML=`<div class="form-sheet" style="max-width:400px">
+    <div class="form-header"><h2>选择地图导航</h2><div class="form-close" onclick="this.closest('.form-overlay').remove()">×</div></div>
+    <div class="form-body">
+      <div style="font-size:13px;color:var(--text-dim);margin-bottom:12px">目的地：${addr}</div>
+      <div class="menu-list">
+        <div class="menu-item" onclick="window.open('https://uri.amap.com/search?keyword='+encodeURIComponent('${addr}'));document.getElementById('mapNavOverlay').remove()"><div class="mi-left"><div class="mi-icon">A</div><span class="mi-label">高德地图</span></div><span class="mi-right">›</span></div>
+        <div class="menu-item" onclick="window.open('https://api.map.baidu.com/geocoder?address='+encodeURIComponent('${addr}')+'&output=html');document.getElementById('mapNavOverlay').remove()"><div class="mi-left"><div class="mi-icon">B</div><span class="mi-label">百度地图</span></div><span class="mi-right">›</span></div>
+        <div class="menu-item" onclick="window.open('https://maps.apple.com/?q='+encodeURIComponent('${addr}'));document.getElementById('mapNavOverlay').remove()"><div class="mi-left"><div class="mi-icon">📍</div><span class="mi-label">Apple地图</span></div><span class="mi-right">›</span></div>
+      </div>
+    </div>
+    <div class="form-footer"><button class="btn btn-secondary btn-full" onclick="this.closest('.form-overlay').remove()">取消</button></div>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function deleteClient(id){
+  if(!confirm('确定删除此客户？相关带看记录会保留但不再关联客户。'))return;
+  state.clients=state.clients.filter(c=>c.id!==id);
+  saveState();switchTab('clients');toast('客户已删除');
+}
+
+// ===== 跟进记录 =====
+function openFollowUpForm(clientId,followUpId){
+  const isEdit=!!followUpId;
+  const f=isEdit?state.followUps.find(x=>x.id===followUpId):null;
+  document.getElementById('followUpFormTitle').textContent=isEdit?'编辑跟进':'新增跟进';
+  document.getElementById('fuf_id').value=isEdit?f.id:'';
+  document.getElementById('fuf_clientId').value=clientId;
+  document.getElementById('fuf_type').value=isEdit?f.type:'电话';
+  document.getElementById('fuf_content').value=isEdit?(f.content||''):'';
+  const dt=isEdit?new Date(f.time):new Date();dt.setMinutes(dt.getMinutes()-dt.getTimezoneOffset());
+  document.getElementById('fuf_time').value=dt.toISOString().slice(0,16);
+  document.getElementById('fuf_deleteBtn').style.display=isEdit?'flex':'none';
+  document.getElementById('followUpFormOverlay').classList.add('active');
+}
+function saveFollowUp(){
+  const content=document.getElementById('fuf_content').value.trim();if(!content){toast('请填写跟进内容');return}
+  const clientId=document.getElementById('fuf_clientId').value;const id=document.getElementById('fuf_id').value;
+  const timeStr=document.getElementById('fuf_time').value;
+  const data={clientId,type:document.getElementById('fuf_type').value,content,time:timeStr?new Date(timeStr).toISOString():new Date().toISOString()};
+  if(id){const idx=state.followUps.findIndex(f=>f.id===id);state.followUps[idx]={...state.followUps[idx],...data};toast('跟进已更新')}
+  else{state.followUps.push({id:uid(),...data,createTime:new Date().toISOString()});toast('跟进已添加')}
+  saveState();closeForm('followUpFormOverlay');if(state._currentClientId)viewClientDetail(state._currentClientId);
+}
+function deleteFollowUpFromForm(){
+  const id=document.getElementById('fuf_id').value;if(!id)return;
+  if(!confirm('确定删除此跟进记录？'))return;
+  state.followUps=state.followUps.filter(f=>f.id!==id);
+  saveState();closeForm('followUpFormOverlay');if(state._currentClientId)viewClientDetail(state._currentClientId);toast('已删除');
+}
+function deleteFollowUp(id){
+  if(!confirm('确定删除此跟进记录？'))return;
+  state.followUps=state.followUps.filter(f=>f.id!==id);
+  saveState();if(state._currentClientId)viewClientDetail(state._currentClientId);toast('已删除');
+}
+
+// ===== 推荐房源管理 =====
+const REC_STATUSES=['未推荐','已推荐','已预约','已带看','意向','淘汰','成交'];
+function openPropertySelector(clientId){
+  const cl=getClient(clientId);if(!cl)return;
+  const recIds=(cl.recommended||[]).map(r=>typeof r==='string'?r:r.propertyId);
+  const available=state.properties.filter(p=>!recIds.includes(p.id));
+  if(available.length===0){toast('没有可推荐的新房源');return}
+  let overlay=document.getElementById('propertySelectorOverlay');
+  if(!overlay){overlay=document.createElement('div');overlay.className='form-overlay';overlay.id='propertySelectorOverlay';document.body.appendChild(overlay)}
+  overlay.className='form-overlay active';
+  overlay.innerHTML=`<div class="form-sheet"><div class="form-header"><h2>选择推荐房源</h2><div class="form-close" onclick="document.getElementById('propertySelectorOverlay').classList.remove('active')">×</div></div><div class="form-body" style="padding:0">${available.map(p=>`<div class="rec-item" onclick="addRecommendation('${clientId}','${p.id}')"><div class="rec-left"><div class="rec-name">${p.name}</div><div class="rec-status">${p.layout||''} · ${p.area}㎡ · ${formatPrice(p.price)}</div></div><span style="color:var(--gold);font-size:13px">+ 选择</span></div>`).join('')}</div></div>`;
+}
+function addRecommendation(clientId,propertyId){
+  const cl=getClient(clientId);if(!cl)return;
+  if(!cl.recommended)cl.recommended=[];
+  cl.recommended.push({propertyId,status:'已推荐'});
+  saveState();document.getElementById('propertySelectorOverlay')?.classList.remove('active');viewClientDetail(clientId);toast('已添加推荐');
+}
+function cycleRecStatus(clientId,propertyId){
+  const cl=getClient(clientId);if(!cl)return;
+  const recs=cl.recommended||[];const rec=recs.find(r=>(typeof r==='string'?r:r.propertyId)===propertyId);if(!rec)return;
+  if(typeof rec==='string'){const idx=recs.indexOf(rec);recs[idx]={propertyId:rec,status:'已预约'}}
+  else{const curIdx=REC_STATUSES.indexOf(rec.status||'已推荐');rec.status=REC_STATUSES[(curIdx+1)%REC_STATUSES.length]}
+  saveState();viewClientDetail(clientId);toast('状态已更新');
+}
+function removeRecommendation(clientId,propertyId){
+  if(!confirm('确定移除此推荐房源？'))return;
+  const cl=getClient(clientId);if(!cl)return;
+  cl.recommended=(cl.recommended||[]).filter(r=>{const pid=typeof r==='string'?r:r.propertyId;return pid!==propertyId});
+  saveState();viewClientDetail(clientId);toast('已移除');
+}
+
+function shareProperty(id){
+  const p=getProp(id);if(!p)return;
+  const W=750,H=1334;
+  const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  // 背景
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#0d0d0d');bg.addColorStop(.5,'#1a1a1a');bg.addColorStop(1,'#0d0d0d');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // 顶部金线
+  ctx.fillStyle='#c9a961';ctx.fillRect(0,0,W,4);
+  // 品牌
+  ctx.font='bold 28px Georgia, serif';ctx.fillStyle='#c9a961';ctx.textAlign='left';ctx.fillText('YUKI',40,60);
+  ctx.font='13px -apple-system, sans-serif';ctx.fillStyle='#888';ctx.fillText('LUXURY PROPERTIES',110,58);
+  // 独家标签
+  if(p.exclusive){
+    ctx.font='12px -apple-system, sans-serif';const lbl='独家代理';const lw=ctx.measureText(lbl).width+24;
+    ctx.fillStyle='rgba(201,169,97,0.15)';roundRect(ctx,W-40-lw,42,lw,28,14);ctx.fill();
+    ctx.strokeStyle='rgba(201,169,97,0.4)';ctx.lineWidth=1;roundRect(ctx,W-40-lw,42,lw,28,14);ctx.stroke();
+    ctx.fillStyle='#c9a961';ctx.textAlign='center';ctx.fillText(lbl,W-40-lw/2,60);
+  }
+  const imgY=90,imgH=400;
+  const finish=()=>{drawCardText(ctx,p,W,H,imgY,imgH);showShareCardPreview(canvas)};
+  if(p.images&&p.images.length>0){
+    const img=new Image();img.crossOrigin='anonymous';
+    img.onload=()=>{
+      ctx.save();roundRect(ctx,40,imgY,W-80,imgH,16);ctx.clip();
+      const sc=Math.max((W-80)/img.width,imgH/img.height);const sw=(W-80)/sc,sh=imgH/sc;
+      ctx.drawImage(img,(img.width-sw)/2,(img.height-sh)/2,sw,sh,40,imgY,W-80,imgH);ctx.restore();finish();
+    };
+    img.onerror=()=>{drawPlaceholder(ctx,p,W,imgY,imgH);finish()};
+    img.src=p.images[0];
+  }else{drawPlaceholder(ctx,p,W,imgY,imgH);finish()}
+}
+
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+
+function drawPlaceholder(ctx,p,W,imgY,imgH){
+  const g=ctx.createLinearGradient(40,imgY,W-40,imgY+imgH);g.addColorStop(0,'#1a1a2e');g.addColorStop(1,'#16213e');
+  ctx.fillStyle=g;roundRect(ctx,40,imgY,W-80,imgH,16);ctx.fill();
+  ctx.font='120px Georgia, serif';ctx.fillStyle='rgba(201,169,97,0.3)';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(p.type==='别墅'?'◆':p.type==='复式'?'◇':'▦',W/2,imgY+imgH/2);ctx.textBaseline='alphabetic';
+}
+
+function drawCardText(ctx,p,W,H,imgY,imgH){
+  let y=imgY+imgH+30;
+  // 名称
+  ctx.font='bold 36px -apple-system, "PingFang SC", sans-serif';ctx.fillStyle='#e0e0e0';ctx.textAlign='left';ctx.fillText(p.name,40,y);
+  // 地址
+  if(p.address){y+=26;ctx.font='14px -apple-system, sans-serif';ctx.fillStyle='#888';ctx.fillText('📍 '+p.address,40,y)}
+  // 价格
+  y+=50;const pt=p.price>=10000?(p.price/10000).toFixed(1)+'亿':p.price+'万';
+  ctx.font='bold 48px Georgia, serif';ctx.fillStyle='#c9a961';ctx.fillText(pt,40,y);
+  ctx.font='14px -apple-system, sans-serif';ctx.fillStyle='#888';ctx.fillText(p.price>=10000?'总价':'万元',40+ctx.measureText(pt).width+8,y-6);
+  // 分割线
+  y+=24;ctx.strokeStyle='#2a2a2a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-40,y);ctx.stroke();
+  // 信息网格
+  y+=30;const infos=[{l:'面积',v:p.area+'㎡'},{l:'户型',v:p.layout||'-'},{l:'楼层',v:p.floor||'-'},{l:'类型',v:p.type||'-'}];
+  const colW=(W-80)/2;
+  infos.forEach((info,i)=>{const col=i%2,row=Math.floor(i/2);const ix=40+col*colW,iy=y+row*60;
+    ctx.font='12px -apple-system, sans-serif';ctx.fillStyle='#666';ctx.fillText(info.l,ix,iy);
+    ctx.font='bold 20px -apple-system, "PingFang SC", sans-serif';ctx.fillStyle='#e0e0e0';ctx.fillText(info.v,ix,iy+26)});
+  y+=130;
+  // 亮点
+  if(p.highlights&&p.highlights.length){
+    y+=10;ctx.font='13px -apple-system, sans-serif';ctx.fillStyle='#c9a961';ctx.fillText('✦ 亮点',40,y);y+=20;
+    let tx=40;
+    p.highlights.slice(0,6).forEach(h=>{
+      ctx.font='12px -apple-system, sans-serif';const tw=ctx.measureText(h).width+20;
+      if(tx+tw>W-40){tx=40;y+=32}
+      ctx.fillStyle='rgba(201,169,97,0.12)';roundRect(ctx,tx,y,tw,26,13);ctx.fill();
+      ctx.fillStyle='#c9a961';ctx.fillText(h,tx+10,y+18);tx+=tw+8;
+    });
+    y+=40;
+  }
+  // 周边配套
+  if(p.surroundings){
+    y+=10;ctx.strokeStyle='#2a2a2a';ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-40,y);ctx.stroke();y+=24;
+    ctx.font='13px -apple-system, sans-serif';ctx.fillStyle='#c9a961';ctx.fillText('◈ 周边配套',40,y);y+=24;
+    const s=p.surroundings;
+    if(s.schools&&s.schools.length){ctx.font='12px -apple-system, sans-serif';ctx.fillStyle='#666';ctx.fillText('国际学校',40,y);ctx.fillStyle='#bbb';ctx.fillText(s.schools.slice(0,2).join('、'),120,y);y+=22}
+    if(s.medical&&s.medical.length){ctx.font='12px -apple-system, sans-serif';ctx.fillStyle='#666';ctx.fillText('医疗资源',40,y);ctx.fillStyle='#bbb';ctx.fillText(s.medical.slice(0,2).join('、'),120,y);y+=22}
+    if(s.transport&&s.transport.length){ctx.font='12px -apple-system, sans-serif';ctx.fillStyle='#666';ctx.fillText('交通',40,y);ctx.fillStyle='#bbb';ctx.fillText(s.transport.slice(0,2).join('、'),120,y);y+=22}
+    if(s.commercial&&s.commercial.length){ctx.font='12px -apple-system, sans-serif';ctx.fillStyle='#666';ctx.fillText('商业配套',40,y);ctx.fillStyle='#bbb';ctx.fillText(s.commercial.slice(0,2).join('、'),120,y);y+=22}
+  }
+  // 底部经纪人联系卡
+  y=H-180;ctx.strokeStyle='rgba(201,169,97,0.3)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-40,y);ctx.stroke();
+  y+=30;
+  // 头像圆
+  ctx.fillStyle='#c9a961';ctx.beginPath();ctx.arc(80,y+20,24,0,2*Math.PI);ctx.fill();
+  ctx.font='bold 22px Georgia, serif';ctx.fillStyle='#0a0a0a';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText((state.agent.avatar||state.agent.name[0]||'Y'),80,y+20);ctx.textBaseline='alphabetic';
+  // 姓名
+  ctx.font='bold 18px -apple-system, "PingFang SC", sans-serif';ctx.fillStyle='#e0e0e0';ctx.textAlign='left';ctx.fillText(state.agent.name||'YUKI',120,y+8);
+  // 职位
+  ctx.font='12px -apple-system, sans-serif';ctx.fillStyle='#888';ctx.fillText(state.agent.title||'豪宅独家代理经纪人',120,y+28);
+  // 电话
+  if(state.agent.phone){ctx.font='13px -apple-system, sans-serif';ctx.fillStyle='#c9a961';ctx.fillText('📞 '+state.agent.phone,120,y+48)}
+  // 右侧品牌
+  ctx.font='bold 14px Georgia, serif';ctx.fillStyle='rgba(201,169,97,0.6)';ctx.textAlign='right';ctx.fillText('YUKI LUXURY',W-40,y+8);
+  ctx.font='10px -apple-system, sans-serif';ctx.fillStyle='#555';ctx.fillText('PROPERTIES',W-40,y+26);
+}
+
+function showShareCardPreview(canvas){
+  const c=document.getElementById('shareCardPreview');c.innerHTML='';canvas.style.maxWidth='100%';canvas.style.borderRadius='12px';c.appendChild(canvas);
+  document.getElementById('shareCardOverlay').classList.add('active');
+}
+
+function saveShareCardImage(){
+  const canvas=document.querySelector('#shareCardPreview canvas');if(!canvas)return;
+  canvas.toBlob(function(blob){
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`YUKI_${Date.now()}.png`;a.click();URL.revokeObjectURL(url);toast('图片已保存');
+  },'image/png');
+}
+
+function copyShareCardImage(){
+  const canvas=document.querySelector('#shareCardPreview canvas');if(!canvas)return;
+  canvas.toBlob(function(blob){
+    if(navigator.clipboard&&navigator.clipboard.write&&window.ClipboardItem){
+      const item=new ClipboardItem({'image/png':blob});
+      navigator.clipboard.write([item]).then(()=>toast('图片已复制到剪贴板')).catch(()=>saveShareCardImage());
+    }else{saveShareCardImage()}
+  },'image/png');
+}
+
+// ===== 带看表单 =====
+function openViewingForm(propertyId,clientId,viewingId){
+  const isEdit=!!viewingId;
+  const v=isEdit?state.viewings.find(x=>x.id===viewingId):null;
+  document.getElementById('viewingFormTitle').textContent=isEdit?'编辑带看':'新增带看';
+  document.getElementById('vf_id').value=isEdit?v.id:'';
+  document.getElementById('vf_deleteBtn').style.display=isEdit?'flex':'none';
+  document.getElementById('vf_agencyCompany').value=isEdit?(v.agencyCompany||''):'';
+  document.getElementById('vf_agentName').value=isEdit?(v.agentName||''):'';
+  document.getElementById('vf_agentPhone').value=isEdit?(v.agentPhone||''):'';
+  document.getElementById('vf_clientName').value=isEdit?(v.clientName||''):'';
+  document.getElementById('vf_clientProfile').value=isEdit?(v.clientProfile||''):'';
+  document.getElementById('vf_likes').value=isEdit?((v.likes||[]).join(',')):'';
+  document.getElementById('vf_dislikes').value=isEdit?((v.dislikes||[]).join(',')):'';
+  document.getElementById('vf_feedback').value=isEdit?(v.feedback||''):'';
+  document.getElementById('vf_followUp').value=isEdit?(v.followUp||''):'';
+  document.getElementById('vf_notes').value=isEdit?(v.notes||''):'';
+  document.getElementById('vf_duration').value=isEdit?(v.duration||60):'60';
+  const rating=isEdit?(v.rating||4):4;const rRadio=document.querySelector(`input[name="rating"][value="${rating}"]`);if(rRadio)rRadio.checked=true;
+  state.tempViewingAttachments=isEdit?[...(v.attachments||[])]:[];renderViewingAttachPreview();
+  const tv=isEdit?new Date(v.viewingTime):new Date();tv.setMinutes(tv.getMinutes()-tv.getTimezoneOffset());
+  document.getElementById('vf_viewingTime').value=tv.toISOString().slice(0,16);
+  const sel=document.getElementById('vf_propertyId');
+  const tp=isEdit?v.propertyId:(propertyId||state.currentPropertyId);
+  sel.innerHTML=state.properties.map(p=>`<option value="${p.id}" ${p.id===tp?'selected':''}>${p.name}</option>`).join('');
+  document.getElementById('vf_clientId').value=isEdit?(v.clientId||''):(clientId||'');
+  if(!isEdit&&clientId){const cl=getClient(clientId);if(cl){document.getElementById('vf_clientName').value=cl.name}}
+  document.getElementById('viewingFormOverlay').classList.add('active');
+}
+function handleViewingAttachments(e){const files=e.target.files;for(const f of files){compressImage(f,1000,.7).then(d=>{state.tempViewingAttachments.push(d);renderViewingAttachPreview()})}e.target.value=''}
+function renderViewingAttachPreview(){document.getElementById('vf_attachPreview').innerHTML=state.tempViewingAttachments.map((img,i)=>`<div class="image-preview"><img src="${img}" onclick="event.stopPropagation();openImageViewer('${img}')"><div class="ip-remove" onclick="event.stopPropagation();state.tempViewingAttachments.splice(${i},1);renderViewingAttachPreview()">×</div></div>`).join('')}
+function saveViewing(){
+  const clientName=document.getElementById('vf_clientName').value.trim();
+  const propertyId=document.getElementById('vf_propertyId').value;
+  const viewingTime=document.getElementById('vf_viewingTime').value;
+  if(!clientName){toast('请填写客户姓名');return}
+  if(!propertyId){toast('请选择房源');return}
+  if(!viewingTime){toast('请选择带看时间');return}
+  const id=document.getElementById('vf_id').value;
+  const rating=document.querySelector('input[name="rating"]:checked')?.value||4;
+  const data={
+    propertyId,
+    agencyCompany:document.getElementById('vf_agencyCompany').value.trim(),
+    clientId:document.getElementById('vf_clientId').value||null,
+    agentName:document.getElementById('vf_agentName').value.trim(),
+    agentPhone:document.getElementById('vf_agentPhone').value.trim(),
+    clientName,
+    clientProfile:document.getElementById('vf_clientProfile').value.trim(),
+    viewingTime:new Date(viewingTime).toISOString(),
+    duration:parseInt(document.getElementById('vf_duration').value)||60,
+    rating:parseInt(rating),
+    likes:document.getElementById('vf_likes').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t),
+    dislikes:document.getElementById('vf_dislikes').value.split(/[,，]/).map(t=>t.trim()).filter(t=>t),
+    feedback:document.getElementById('vf_feedback').value.trim(),
+    followUp:document.getElementById('vf_followUp').value.trim(),
+    notes:document.getElementById('vf_notes').value.trim(),
+    attachments:state.tempViewingAttachments
+  };
+  if(id){const idx=state.viewings.findIndex(v=>v.id===id);state.viewings[idx]={...state.viewings[idx],...data};toast('带看已更新')}
+  else{state.viewings.push({id:uid(),...data,createTime:new Date().toISOString()});toast('带看已添加')}
+  saveState();closeForm('viewingFormOverlay');refreshCurrentPage();
+}
+
+function refreshCurrentPage(){
+  const ap=document.querySelector('.page.active');if(!ap)return;
+  const pid=ap.id;
+  if(pid==='page-property-detail'&&state.currentPropertyId)viewPropertyDetail(state.currentPropertyId);
+  else if(pid==='page-client-detail'&&state._currentClientId)viewClientDetail(state._currentClientId);
+  else if(pid==='page-viewings')renderViewingsList();
+  else if(pid==='page-workbench')renderWorkbench();
+}
+
+function deleteViewingFromForm(){
+  const id=document.getElementById('vf_id').value;if(!id)return;
+  if(!confirm('确定删除此带看记录？'))return;
+  state.viewings=state.viewings.filter(v=>v.id!==id);
+  saveState();closeForm('viewingFormOverlay');refreshCurrentPage();toast('带看记录已删除');
+}
+
+// ===== 客户表单 =====
+function openClientForm(){
+  document.getElementById('clientFormTitle').textContent='新增客户';
+  document.getElementById('cf_id').value='';
+  ['cf_name','cf_phone','cf_budget','cf_area','cf_layout','cf_payment','cf_family','cf_job','cf_requirements','cf_notes'].forEach(i=>document.getElementById(i).value='');
+  document.querySelector('input[name="clevel"][value="A"]').checked=true;
+  document.getElementById('cf_type').value='投资';
+  document.getElementById('clientFormOverlay').classList.add('active');
+}
+function editClient(id){
+  const cl=getClient(id);if(!cl)return;
+  document.getElementById('clientFormTitle').textContent='编辑客户';
+  document.getElementById('cf_id').value=cl.id;document.getElementById('cf_name').value=cl.name;
+  document.getElementById('cf_phone').value=cl.phone||'';document.getElementById('cf_budget').value=cl.budget||'';
+  document.getElementById('cf_area').value=cl.area||'';document.getElementById('cf_layout').value=cl.layout||'';
+  document.getElementById('cf_payment').value=cl.payment||'';document.getElementById('cf_family').value=cl.family||'';
+  document.getElementById('cf_job').value=cl.job||'';document.getElementById('cf_requirements').value=cl.requirements||'';
+  document.getElementById('cf_notes').value=cl.notes||'';
+  const r=document.querySelector(`input[name="clevel"][value="${cl.level}"]`);if(r)r.checked=true;
+  document.getElementById('cf_type').value=cl.type||'投资';
+  document.getElementById('clientFormOverlay').classList.add('active');
+  document.querySelectorAll('.page').forEach(pg=>pg.classList.remove('active'));
+  document.getElementById('page-clients').classList.add('active');
+}
+function saveClient(){
+  const name=document.getElementById('cf_name').value.trim();if(!name){toast('请填写客户姓名');return}
+  const id=document.getElementById('cf_id').value;
+  const level=document.querySelector('input[name="clevel"]:checked')?.value||'A';
+  const data={
+    name,phone:document.getElementById('cf_phone').value.trim(),level,
+    budget:parseFloat(document.getElementById('cf_budget').value)||0,
+    type:document.getElementById('cf_type').value,
+    area:document.getElementById('cf_area').value.trim(),
+    layout:document.getElementById('cf_layout').value.trim(),
+    payment:document.getElementById('cf_payment').value.trim(),
+    family:document.getElementById('cf_family').value.trim(),
+    job:document.getElementById('cf_job').value.trim(),
+    requirements:document.getElementById('cf_requirements').value.trim(),
+    notes:document.getElementById('cf_notes').value.trim()
+  };
+  if(id){const idx=state.clients.findIndex(c=>c.id===id);state.clients[idx]={...state.clients[idx],...data};toast('客户已更新')}
+  else{state.clients.push({id:uid(),...data,recommended:[],viewed:[],favorited:[],nextAction:null,createTime:new Date().toISOString()});toast('客户已添加')}
+  saveState();closeForm('clientFormOverlay');renderClients();
+}
+
+// ===== 图片处理 =====
+function compressImage(file,maxSize,quality){return new Promise(resolve=>{const r=new FileReader();r.onload=e=>{const img=new Image();img.onload=()=>{let{width,height}=img;if(width>height&&width>maxSize){height=height*maxSize/width;width=maxSize}else if(height>maxSize){width=width*maxSize/height;height=maxSize}const c=document.createElement('canvas');c.width=width;c.height=height;c.getContext('2d').drawImage(img,0,0,width,height);resolve(c.toDataURL('image/jpeg',quality))};img.src=e.target.result};r.readAsDataURL(file)})}
+function openImageViewer(src){document.getElementById('viewerImg').src=src;document.getElementById('imageViewer').classList.add('active')}
+function closeImageViewer(){document.getElementById('imageViewer').classList.remove('active')}
+function closeForm(id){document.getElementById(id).classList.remove('active')}
+
+// ===== 房贷计算 =====
+function openCalculator(){document.getElementById('calcOverlay').classList.add('active');document.getElementById('calcResult').classList.add('hidden')}
+function calculateLoan(){
+  const price=parseFloat(document.getElementById('calc_price').value)*10000;
+  const downRate=parseFloat(document.getElementById('calc_downRate').value)/100;
+  const years=parseInt(document.getElementById('calc_years').value);
+  const rate=parseFloat(document.getElementById('calc_rate').value)/100/12;
+  const months=years*12;
+  const down=price*downRate;const loan=price-down;
+  const monthly=loan*rate*Math.pow(1+rate,months)/(Math.pow(1+rate,months)-1);
+  const total=monthly*months;const interest=total-loan;
+  const r=document.getElementById('calcResult');r.classList.remove('hidden');
+  r.innerHTML=`<div style="font-size:13px;color:var(--text-dim)">月供</div><div style="font-size:30px;color:var(--gold);font-weight:700;margin:4px 0">${monthly.toFixed(0).toLocaleString()}</div><div style="font-size:12px;color:var(--text-dim);line-height:1.8">首付：${(down/10000).toFixed(1)}万<br>贷款：${(loan/10000).toFixed(1)}万<br>还款总额：${(total/10000).toFixed(1)}万<br>利息：${(interest/10000).toFixed(1)}万</div>`;
+}
+
+// ===== 数据导入导出 =====
+function exportData(){
+  const data={properties:state.properties,clients:state.clients,viewings:state.viewings,todos:state.todos,followUps:state.followUps,agent:state.agent,exportTime:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`YUKI豪宅代理_数据_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(url);toast('数据已导出');
+}
+function importData(e){
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(d.properties)state.properties=d.properties;if(d.clients)state.clients=d.clients;if(d.viewings)state.viewings=d.viewings;if(d.todos)state.todos=d.todos;if(d.followUps)state.followUps=d.followUps;if(state.properties.length>0&&!state.currentPropertyId)state.currentPropertyId=state.properties[0].id;saveState();updateCurrentPropertyDisplay();switchTab('workbench');toast('数据导入成功')}catch(err){toast('导入失败：格式错误')}};r.readAsText(f);e.target.value='';
+}
+function clearAllData(){
+  if(!confirm('确定清除所有数据？此操作不可恢复！'))return;
+  if(!confirm('再次确认：所有房源、客户、带看记录将被删除！'))return;
+  localStorage.removeItem(STORAGE_KEY);state.properties=[];state.clients=[];state.viewings=[];state.todos=[];state.followUps=[];state.currentPropertyId=null;initSampleData();updateCurrentPropertyDisplay();switchTab('workbench');toast('已重置为示例数据');
+}
+function showAbout(){alert('YUKI豪宅代理 v5.0\n\n独家代理人工作台\n\n核心功能：\n· 房源工作台（8大模块）\n· 客户工作台（6大模块）\n· 今日待办管理\n· AI反馈分析与房东建议\n· 房东周报自动生成\n\n数据存储：本地浏览器，无需联网')}
+
+// ===== 初始化 =====
+function init(){
+  if(!loadState()||state.properties.length===0)initSampleData();
+  updateCurrentPropertyDisplay();updateClock();setInterval(updateClock,1000);renderWorkbench();
+}
+init();
+
+// 注册 Service Worker，把整个 App 缓存到本机，实现永久离线打开
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
